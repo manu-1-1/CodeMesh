@@ -208,3 +208,45 @@ router.delete('/:workspaceId', async (req, res) => {
 });
 
 
+// List all members of a workspace
+router.get('/:workspaceId/members', async (req, res) => {
+    const { workspaceId } = req.params;
+    const userId = req.user.id;
+
+    try {
+        // Verify current user is a member of this workspace
+        const callerMember = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId,
+                    userId,
+                },
+            },
+        });
+
+        if (!callerMember) {
+            return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
+        }
+
+        // Get all members
+        const members = await prisma.workspaceMember.findMany({
+            where: { workspaceId },
+            select: {
+                role: true,
+                joinedAt: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        avatarUrl: true,
+                    },
+                },
+            },
+        });
+
+        res.json(members);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
