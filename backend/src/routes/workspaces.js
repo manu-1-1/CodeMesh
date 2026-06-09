@@ -335,3 +335,63 @@ router.post('/:workspaceId/members', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Remove a member from the workspace
+router.delete('/:workspaceId/members/:userId', async (req, res) => {
+    const { workspaceId, userId: targetUserId } = req.params;
+    const callerId = req.user.id;
+
+    try {
+        // 1. Verify caller role (OWNER or ADMIN)
+        const callerMember = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId,
+                    userId: callerId,
+                },
+            },
+        });
+
+        if (!callerMember || (callerMember.role !== 'OWNER' && callerMember.role !== 'ADMIN')) {
+            return res.status(403).json({ error: 'Access denied: Only owners and admins can remove members' });
+        }
+
+        // 2. Verify target user is in the workspace
+        const targetMember = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId,
+                    userId: targetUserId,
+                },
+            },
+        });
+
+        if (!targetMember) {
+            return res.status(404).json({ error: 'Member not found in this workspace' });
+        }
+
+        // 3. Prevent removing the workspace OWNER
+        if (targetMember.role === 'OWNER') {
+            return res.status(400).json({ error: 'Cannot remove the owner of the workspace' });
+        }
+
+        // 4. Admin cannot remove other admins
+        if (callerMember.role === 'ADMIN' && targetMember.role === 'ADMIN') {
+            return res.status(403).json({ error: 'Access denied: Workspace admins cannot remove other admins' });
+        }
+
+        // 5. Remove the member
+        await prisma.workspaceMember.delete({
+            where: {
+                workspaceId_userId: {
+                    workspaceId,
+                    userId: targetUserId,
+                },
+            },
+        });
+
+        res.json({ message: 'Member removed successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
