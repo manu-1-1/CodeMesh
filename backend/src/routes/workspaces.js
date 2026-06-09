@@ -7,7 +7,6 @@ const router = express.Router();
 // Apply authentication middleware to all routes in this router
 router.use(authenticateToken);
 
-export default router;
 
 // Create a new workspace
 router.post('/', async (req, res) => {
@@ -395,3 +394,5 @@ router.delete('/:workspaceId/members/:userId', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+export default router;
