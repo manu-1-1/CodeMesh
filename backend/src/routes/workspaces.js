@@ -49,3 +49,92 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+// Get all workspaces the current user belongs to
+router.get('/', async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const workspaces = await prisma.workspace.findMany({
+            where: {
+                members: {
+                    some: {
+                        userId: userId,
+                    },
+                },
+            },
+            include: {
+                members: {
+                    select: {
+                        role: true,
+                        joinedAt: true,
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                avatarUrl: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        res.json(workspaces);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get specific workspace details by ID
+router.get('/:workspaceId', async (req, res) => {
+    const { workspaceId } = req.params;
+    const userId = req.user.id;
+
+    try {
+        // 1. Verify user membership in this workspace
+        const member = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId,
+                    userId,
+                },
+            },
+        });
+
+        if (!member) {
+            return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
+        }
+
+        // 2. Retrieve workspace details
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+            include: {
+                members: {
+                    select: {
+                        role: true,
+                        joinedAt: true,
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                avatarUrl: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!workspace) {
+            return res.status(404).json({ error: 'Workspace not found' });
+        }
+
+        res.json(workspace);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
