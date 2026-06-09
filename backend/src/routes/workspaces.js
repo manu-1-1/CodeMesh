@@ -138,3 +138,73 @@ router.get('/:workspaceId', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Update workspace details
+router.put('/:workspaceId', async (req, res) => {
+    const { workspaceId } = req.params;
+    const { name, description } = req.body;
+    const userId = req.user.id;
+
+    try {
+        // Find workspace to verify ownership
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+        });
+
+        if (!workspace) {
+            return res.status(404).json({ error: 'Workspace not found' });
+        }
+
+        // Verify that the user is the owner
+        if (workspace.ownerId !== userId) {
+            return res.status(403).json({ error: 'Access denied: Only the workspace owner can update it' });
+        }
+
+        const updatedWorkspace = await prisma.workspace.update({
+            where: { id: workspaceId },
+            data: {
+                name: name !== undefined ? name : workspace.name,
+                description: description !== undefined ? description : workspace.description,
+            },
+        });
+
+        res.json({
+            message: 'Workspace updated successfully',
+            workspace: updatedWorkspace,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete workspace
+router.delete('/:workspaceId', async (req, res) => {
+    const { workspaceId } = req.params;
+    const userId = req.user.id;
+
+    try {
+        // Find workspace to verify ownership
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+        });
+
+        if (!workspace) {
+            return res.status(404).json({ error: 'Workspace not found' });
+        }
+
+        // Verify that the user is the owner
+        if (workspace.ownerId !== userId) {
+            return res.status(403).json({ error: 'Access denied: Only the workspace owner can delete it' });
+        }
+
+        await prisma.workspace.delete({
+            where: { id: workspaceId },
+        });
+
+        res.json({ message: 'Workspace deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
