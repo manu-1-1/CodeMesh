@@ -1,0 +1,203 @@
+=== Testing Workspace & Member Management Endpoints ===
+
+1. Registering test users...
+✅ Users registered successfully.
+
+2. Creating workspace as User A (Owner)...
+Status: 201 {
+  message: 'Workspace created successfully',
+  workspace: {
+    id: '181a3259-f134-4d94-978f-0f806e6f598b',
+    name: 'Test Workspace Org',
+    description: 'Initial workspace description',
+    ownerId: 'ca4e062d-667e-4317-ba1e-f8e83d84a814',
+    createdAt: '2026-06-10T13:36:53.873Z',
+    updatedAt: '2026-06-10T13:36:53.873Z'
+  },
+  defaultChannel: {
+    id: '675c0fb7-1bc3-43f7-b570-e6ec4afb3fed',
+    workspaceId: '181a3259-f134-4d94-978f-0f806e6f598b',
+    name: 'general',
+    type: 'GENERAL',
+    createdAt: '2026-06-10T13:36:53.879Z'
+  }
+}
+
+3. Listing workspaces for Owner...
+Status: 200, Count: 1
+
+4. Fetching workspace details by ID...
+Status: 200 {
+  id: '181a3259-f134-4d94-978f-0f806e6f598b',
+  name: 'Test Workspace Org',
+  description: 'Initial workspace description',
+  ownerId: 'ca4e062d-667e-4317-ba1e-f8e83d84a814',
+  createdAt: '2026-06-10T13:36:53.873Z',
+  updatedAt: '2026-06-10T13:36:53.873Z',
+  members: [
+    {
+      role: 'OWNER',
+      joinedAt: '2026-06-10T13:36:53.876Z',
+      user: [Object]
+    }
+  ]
+}
+
+5. Updating workspace name and description...
+Status: 200 {
+  message: 'Workspace updated successfully',
+  workspace: {
+    id: '181a3259-f134-4d94-978f-0f806e6f598b',
+    name: 'Updated Workspace Org',
+    description: 'Updated workspace description',
+    ownerId: 'ca4e062d-667e-4317-ba1e-f8e83d84a814',
+    createdAt: '2026-06-10T13:36:53.873Z',
+    updatedAt: '2026-06-10T13:36:53.908Z'
+  }
+}
+
+6. Inviting Admin member...
+Status: 201 {
+  message: 'Member added successfully',
+  member: {
+    role: 'ADMIN',
+    joinedAt: '2026-06-10T13:36:53.916Z',
+    user: {
+      id: '3c276f81-d856-48dd-81de-b173871d4c32',
+      name: 'Workspace Admin',
+      email: 'ws_admin_1781098613455@example.com'
+    }
+  }
+}
+
+7. Inviting regular Member...
+Status: 201 {
+  message: 'Member added successfully',
+  member: {
+    role: 'MEMBER',
+    joinedAt: '2026-06-10T13:36:53.924Z',
+    user: {
+      id: '9b209e33-505e-4e13-a612-bcd56628f0c3',
+      name: 'Workspace Member',
+      email: 'ws_member_1781098613455@example.com'
+    }
+  }
+}
+
+8. Listing all members of the workspace...
+Status: 200, Count: 3 [
+  {
+    role: 'OWNER',
+    joinedAt: '2026-06-10T13:36:53.876Z',
+    user: {
+      id: 'ca4e062d-667e-4317-ba1e-f8e83d84a814',
+      name: 'Workspace Owner',
+      email: 'ws_owner_1781098613455@example.com',
+      avatarUrl: null
+    }
+  },
+  {
+    role: 'ADMIN',
+    joinedAt: '2026-06-10T13:36:53.916Z',
+    user: {
+      id: '3c276f81-d856-48dd-81de-b173871d4c32',
+      name: 'Workspace Admin',
+      email: 'ws_admin_1781098613455@example.com',
+      avatarUrl: null
+    }
+  },
+  {
+    role: 'MEMBER',
+    joinedAt: '2026-06-10T13:36:53.924Z',
+    user: {
+      id: '9b209e33-505e-4e13-a612-bcd56628f0c3',
+      name: 'Workspace Member',
+      email: 'ws_member_1781098613455@example.com',
+      avatarUrl: null
+    }
+  }
+]
+
+9. Trying to invite user as a regular member (should fail)...
+Status: 403 { error: 'Access denied: Only owners and admins can invite members' }
+✅ Correctly rejected member invitation permission
+
+10. Trying to invite user as an Admin (should succeed)...
+Status: 201 {
+  message: 'Member added successfully',
+  member: {
+    role: 'MEMBER',
+    joinedAt: '2026-06-10T13:36:53.935Z',
+    user: {
+      id: '532ac44b-88c5-4317-9211-dd3e52558060',
+      name: 'Workspace Stranger',
+      email: 'ws_stranger_1781098613455@example.com'
+    }
+  }
+}
+✅ Admin successfully invited member
+
+11. Stranger trying to view workspace details (should fail)...
+Status: 200 {
+  id: '181a3259-f134-4d94-978f-0f806e6f598b',
+  name: 'Updated Workspace Org',
+  description: 'Updated workspace description',
+  ownerId: 'ca4e062d-667e-4317-ba1e-f8e83d84a814',
+  createdAt: '2026-06-10T13:36:53.873Z',
+  updatedAt: '2026-06-10T13:36:53.908Z',
+  members: [
+    {
+      role: 'OWNER',
+      joinedAt: '2026-06-10T13:36:53.876Z',
+      user: [Object]
+    },
+    {
+      role: 'ADMIN',
+      joinedAt: '2026-06-10T13:36:53.916Z',
+      user: [Object]
+    },
+    {
+      role: 'MEMBER',
+      joinedAt: '2026-06-10T13:36:53.924Z',
+      user: [Object]
+    },
+    {
+      role: 'MEMBER',
+      joinedAt: '2026-06-10T13:36:53.935Z',
+      user: [Object]
+    }
+  ]
+}
+Removing stranger from workspace to test stranger block...
+Stranger view after removal status: 403 { error: 'Access denied: You are not a member of this workspace' }
+✅ Correctly blocked non-member from viewing workspace details
+
+12. Admin trying to kick the workspace Owner (should fail)...
+Status: 400 { error: 'Cannot remove the owner of the workspace' }
+✅ Correctly prevented kicking workspace Owner
+
+13. Admin trying to kick another Admin (should fail)...
+Status: 403 { error: 'Access denied: Workspace admins cannot remove other admins' }
+✅ Correctly prevented Admin from removing another Admin
+
+14. Admin kicking regular Member (should succeed)...
+Status: 200 { message: 'Member removed successfully' }
+✅ Admin successfully kicked regular member
+
+15. Owner kicking Admin (should succeed)...
+Status: 200 { message: 'Member removed successfully' }
+✅ Owner successfully kicked Admin
+
+16. Admin trying to delete workspace (should fail)...
+Status: 403 { error: 'Access denied: Only the workspace owner can delete it' }
+✅ Correctly prevented Admin from deleting workspace
+
+17. Owner deleting workspace (should succeed)...
+Status: 200 { message: 'Workspace deleted successfully' }
+✅ Workspace deleted successfully
+
+18. Verifying workspace is no longer retrievable...
+Status: 403 { error: 'Access denied: You are not a member of this workspace' }
+✅ Workspace deletion verified successfully
+
+✅ ALL WORKSPACE & MEMBER TESTS PASSED SUCCESSFULLY!

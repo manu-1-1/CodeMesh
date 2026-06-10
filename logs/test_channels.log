@@ -1,0 +1,137 @@
+=== Testing Channel Management Endpoints ===
+
+1. Registering workspace owner...
+Status: 201 {
+  message: 'User registered successfully',
+  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImExMDdlZjEwLWQ4ZmMtNDQ0Ny1iZTJlLWQxOTllZGFiZDQzMiIsImlhdCI6MTc4MTA5ODYyMCwiZXhwIjoxNzgxMTg1MDIwfQ.VPXZY6XjBqYZk-XfK9T7shmMQu4kJ8tcsO75bat75WI',
+  user: {
+    id: 'a107ef10-d8fc-4447-be2e-d199edabd432',
+    name: 'Channel Owner',
+    email: 'owner_1781098619924@example.com'
+  }
+}
+
+2. Registering regular workspace member...
+Status: 201 {
+  message: 'User registered successfully',
+  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM3ZmFiODIxLTdiN2UtNDY4ZC05YmEwLWE0ZmI2NzliNmI5ZiIsImlhdCI6MTc4MTA5ODYyMCwiZXhwIjoxNzgxMTg1MDIwfQ.VzytXbtV5DVjDWXI6NdtsBIQ9HxpeAk2GywhnQCDIVU',
+  user: {
+    id: '37fab821-7b7e-468d-9ba0-a4fb679b6b9f',
+    name: 'Channel Member',
+    email: 'member_1781098619924@example.com'
+  }
+}
+
+3. Creating workspace (should automatically create 'general' channel)...
+Status: 201 {
+  message: 'Workspace created successfully',
+  workspace: {
+    id: '9d9770ef-9c7c-48dd-9e74-e9fef4fbdafb',
+    name: 'Test Channels Workspace',
+    description: 'Testing channels isolation',
+    ownerId: 'a107ef10-d8fc-4447-be2e-d199edabd432',
+    createdAt: '2026-06-10T13:37:00.086Z',
+    updatedAt: '2026-06-10T13:37:00.086Z'
+  },
+  defaultChannel: {
+    id: 'b395c866-1f3d-4b84-8447-0fa26ce61784',
+    workspaceId: '9d9770ef-9c7c-48dd-9e74-e9fef4fbdafb',
+    name: 'general',
+    type: 'GENERAL',
+    createdAt: '2026-06-10T13:37:00.087Z'
+  }
+}
+✅ Default general channel verified successfully!
+
+4. Adding member to workspace...
+Status: 201 {
+  message: 'Member added successfully',
+  member: {
+    role: 'MEMBER',
+    joinedAt: '2026-06-10T13:37:00.093Z',
+    user: {
+      id: '37fab821-7b7e-468d-9ba0-a4fb679b6b9f',
+      name: 'Channel Member',
+      email: 'member_1781098619924@example.com'
+    }
+  }
+}
+
+5. Creating custom CHAT channel as owner...
+Status: 201 {
+  message: 'Channel created successfully',
+  channel: {
+    id: '9f743df7-38fc-4b37-b6d2-8a74d7555a95',
+    workspaceId: '9d9770ef-9c7c-48dd-9e74-e9fef4fbdafb',
+    name: 'code-reviews',
+    type: 'CODE_REVIEW',
+    createdAt: '2026-06-10T13:37:00.104Z'
+  }
+}
+
+6. Trying to create duplicate channel (case-insensitive name check)...
+Status: 400 {
+  error: 'A channel with the name "Code-Reviews" already exists in this workspace'
+}
+✅ Correctly rejected duplicate channel name!
+
+7. Trying to create channel as regular member (should fail)...
+Status: 403 {
+  error: 'Access denied: Only workspace owners and admins can create channels'
+}
+✅ Correctly blocked regular member from creating a channel
+
+8. Listing channels as workspace owner...
+Status: 200, Count: 2 [
+  {
+    id: 'b395c866-1f3d-4b84-8447-0fa26ce61784',
+    workspaceId: '9d9770ef-9c7c-48dd-9e74-e9fef4fbdafb',
+    name: 'general',
+    type: 'GENERAL',
+    createdAt: '2026-06-10T13:37:00.087Z'
+  },
+  {
+    id: '9f743df7-38fc-4b37-b6d2-8a74d7555a95',
+    workspaceId: '9d9770ef-9c7c-48dd-9e74-e9fef4fbdafb',
+    name: 'code-reviews',
+    type: 'CODE_REVIEW',
+    createdAt: '2026-06-10T13:37:00.104Z'
+  }
+]
+
+9. Listing channels as workspace member...
+Status: 200, Count: 2
+
+10. Listing channels as non-member of workspace...
+Status: 403 { error: 'Access denied: You are not a member of this workspace' }
+✅ Correctly blocked non-member from listing channels
+
+11. Trying to delete default general channel (should fail)...
+Status: 400 { error: 'Access denied: Cannot delete the default general channel' }
+✅ Correctly blocked deletion of default general channel
+
+12. Trying to delete custom channel as regular member (should fail)...
+Status: 403 {
+  error: 'Access denied: Only workspace owners and admins can delete channels'
+}
+✅ Correctly blocked member from deleting channel
+
+13. Deleting custom channel as owner...
+Status: 200 { message: 'Channel deleted successfully' }
+
+14. Listing channels again to verify deletion...
+Status: 200, Count: 1 [
+  {
+    id: 'b395c866-1f3d-4b84-8447-0fa26ce61784',
+    workspaceId: '9d9770ef-9c7c-48dd-9e74-e9fef4fbdafb',
+    name: 'general',
+    type: 'GENERAL',
+    createdAt: '2026-06-10T13:37:00.087Z'
+  }
+]
+✅ Deletion successfully verified!
+
+15. Cleaning up test workspace (Cascade check)...
+Status: 200 { message: 'Workspace deleted successfully' }
+
+✅ ALL CHANNEL TESTS PASSED SUCCESSFULLY!
