@@ -3,6 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/auth.js';
 import { prisma } from './lib/prisma.js';
 import workspaceRoutes from './routes/workspaces.js';
+import channelRoutes from './routes/channels.js';
 
 
 const app = express();
@@ -15,6 +16,8 @@ app.use(express.json());
 app.use('/api/v1/auth', authRoutes);
 // Workspace routes registration
 app.use('/api/v1/workspaces', workspaceRoutes);
+// Channel routes registration
+app.use('/api/v1/channels', channelRoutes);
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
