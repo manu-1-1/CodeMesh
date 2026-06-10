@@ -37,12 +37,22 @@ router.post('/', async (req, res) => {
                 },
             });
 
-            return { workspace, membership };
+            // 3. Create default general channel
+            const channel = await tx.channel.create({
+                data: {
+                    workspaceId: workspace.id,
+                    name: 'general',
+                    type: 'GENERAL',
+                },
+            });
+
+            return { workspace, membership, channel };
         });
 
         res.status(201).json({
             message: 'Workspace created successfully',
             workspace: result.workspace,
+            defaultChannel: result.channel,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

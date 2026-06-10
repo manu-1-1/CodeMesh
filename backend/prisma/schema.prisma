@@ -35,6 +35,7 @@ model Workspace {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   members     WorkspaceMember[]
+  channels    Channel[]
 
   @@map("workspaces")
 }
@@ -51,3 +52,23 @@ model WorkspaceMember {
   @@id([workspaceId, userId])
   @@map("workspace_members")
 }
+
+enum ChannelType {
+  GENERAL
+  CHAT
+  CODE_REVIEW
+}
+
+model Channel {
+  id          String      @id @default(uuid())
+  workspaceId String      @map("workspace_id")
+  name        String
+  type        ChannelType @default(CHAT)
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, name])
+  @@map("channels")
+}
+
