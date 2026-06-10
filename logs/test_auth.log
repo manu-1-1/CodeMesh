@@ -1,0 +1,38 @@
+=== Testing Authentication Endpoints ===
+
+1. Registering new user...
+Status: 201
+Response: {
+  message: 'User registered successfully',
+  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQwMGVhODcwLTc5M2EtNDI2Zi1hZmZmLTE4YzU5OWE4ZDFiMiIsImlhdCI6MTc4MTA5ODcxMywiZXhwIjoxNzgxMTg1MTEzfQ.UTEmPjZS7xM4F9-AP9epddmmbJRpmaA2ETMlUQNxd4M',
+  user: {
+    id: 'd00ea870-793a-426f-afff-18c599a8d1b2',
+    name: 'Test User',
+    email: 'test_1781098713767@example.com'
+  }
+}
+
+2. Logging in...
+Status: 200
+Response: {
+  message: 'Login successful',
+  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQwMGVhODcwLTc5M2EtNDI2Zi1hZmZmLTE4YzU5OWE4ZDFiMiIsImlhdCI6MTc4MTA5ODcxNCwiZXhwIjoxNzgxMTg1MTE0fQ.RLToKPK8ERnMaQhegvUvDfUnosnRIHieqEskBRBBxr4',
+  user: {
+    id: 'd00ea870-793a-426f-afff-18c599a8d1b2',
+    name: 'Test User',
+    email: 'test_1781098713767@example.com',
+    avatarUrl: null
+  }
+}
+
+3. Fetching user profile (/me)...
+Status: 200
+Response: {
+  id: 'd00ea870-793a-426f-afff-18c599a8d1b2',
+  name: 'Test User',
+  email: 'test_1781098713767@example.com',
+  avatarUrl: null,
+  createdAt: '2026-06-10T13:38:33.992Z'
+}
+
+✅ ALL TESTS PASSED SUCCESSFULLY!
