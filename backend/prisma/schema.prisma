@@ -22,6 +22,7 @@ model User {
   updatedAt    DateTime          @updatedAt
   workspaces   Workspace[]       @relation("WorkspaceOwner")
   memberships  WorkspaceMember[]
+  messages     Message[]
 
   @@map("users")
 }
@@ -67,6 +68,7 @@ model Channel {
   createdAt   DateTime    @default(now()) @map("created_at")
 
   workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  messages    Message[]
 
   @@unique([workspaceId, name])
   @@map("channels")
