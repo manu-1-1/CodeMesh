@@ -4,6 +4,7 @@ import authRoutes from './routes/auth.js';
 import { prisma } from './lib/prisma.js';
 import workspaceRoutes from './routes/workspaces.js';
 import channelRoutes from './routes/channels.js';
+import messageRoutes from './routes/messages.js';
 
 
 const app = express();
@@ -18,6 +19,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/workspaces', workspaceRoutes);
 // Channel routes registration
 app.use('/api/v1/channels', channelRoutes);
+// Message routes registration
+app.use('/api/v1/channels', messageRoutes);
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
