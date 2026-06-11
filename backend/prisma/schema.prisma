@@ -72,3 +72,16 @@ model Channel {
   @@map("channels")
 }
 
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  channelId String   @map("channel_id")
+  senderId  String   @map("sender_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
