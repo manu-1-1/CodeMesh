@@ -1,0 +1,27 @@
+=== Testing Real-Time Chat & Message Endpoints ===
+
+1. Setting up users, workspace, and member invite...
+✅ Basic setup completed.
+
+2. Testing socket connection & authentication...
+✅ Workspace Owner socket authenticated and connected.
+✅ Workspace Member socket authenticated and connected.
+✅ Successfully blocked socket with invalid token: Authentication error: Invalid or expired token
+
+3. Testing room join permissions...
+❌ Socket error event: { message: 'Access denied: You are not a member of this workspace' }
+✅ Sockets joined channels.
+
+4. Testing real-time message sending and receipt...
+✅ Member successfully received owner's message in real-time: Hello from Owner!
+✅ Verified that non-members do not receive room messages.
+
+5. Testing message retrieval endpoint...
+Status: 200, Message Count: 1
+✅ Workspace member fetched history successfully!
+Stranger Status: 403
+✅ Blocked non-member from fetching messages history.
+
+6. Cleaning up sockets and workspace...
+
+✅ ALL REAL-TIME CHAT & MESSAGE TESTS PASSED SUCCESSFULLY!
