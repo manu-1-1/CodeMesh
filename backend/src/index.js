@@ -5,6 +5,8 @@ import { prisma } from './lib/prisma.js';
 import workspaceRoutes from './routes/workspaces.js';
 import channelRoutes from './routes/channels.js';
 import messageRoutes from './routes/messages.js';
+import http from 'http';
+import { initSocket } from './lib/socket.js'
 
 
 const app = express();
@@ -32,6 +34,10 @@ app.get('/health', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+
+initSocket(server);
+
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
