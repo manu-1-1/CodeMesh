@@ -80,6 +80,7 @@ export function initSocket(server) {
                 // Broadcast user joined info to other channel members
                 socket.to(`channel:${channelId}`).emit('user_joined', { userId: socket.userId });
             } catch (error) {
+                console.error("Error in join_channel event:", error);
                 socket.emit('error', { message: error.message });
             }
         });
@@ -150,15 +151,20 @@ export function initSocket(server) {
                 io.to(`channel:${channelId}`).emit('new_message', message);
                 console.log(`✉️ Message sent in channel:${channelId} by user:${socket.userId}`);
             } catch (error) {
+                console.error("Error in send_message event:", error);
                 socket.emit('error', { message: error.message });
             }
         });
 
         // Handle typing indicators
         socket.on('typing', ({ channelId, isTyping }) => {
-            if (!channelId) return;
-            const eventName = isTyping ? 'typing_started' : 'typing_stopped';
-            socket.to(`channel:${channelId}`).emit(eventName, { userId: socket.userId });
+            try {
+                if (!channelId) return;
+                const eventName = isTyping ? 'typing_started' : 'typing_stopped';
+                socket.to(`channel:${channelId}`).emit(eventName, { userId: socket.userId });
+            } catch (error) {
+                console.error("Error in typing event:", error);
+            }
         });
 
         socket.on('disconnect', () => {
