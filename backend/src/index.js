@@ -7,6 +7,7 @@ import channelRoutes from './routes/channels.js';
 import messageRoutes from './routes/messages.js';
 import http from 'http';
 import { initSocket } from './lib/socket.js'
+import snippetRoutes from './routes/snippets.js';
 
 
 const app = express();
@@ -23,6 +24,9 @@ app.use('/api/v1/workspaces', workspaceRoutes);
 app.use('/api/v1/channels', channelRoutes);
 // Message routes registration
 app.use('/api/v1/channels', messageRoutes);
+// Snippet routes registration
+app.use('/api/v1/snippets', snippetRoutes);
+
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
