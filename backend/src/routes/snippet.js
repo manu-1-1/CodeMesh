@@ -72,3 +72,45 @@ router.get('/:snippetId', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// 3. Update a Snippet
+router.put('/:snippetId', async (req, res) => {
+    const { snippetId } = req.params;
+    const { title, language, code } = req.body;
+    const userId = req.user.id;
+    try {
+        const snippet = await prisma.snippet.findUnique({
+            where: { id: snippetId }
+        });
+        if (!snippet) {
+            return res.status(404).json({ error: 'Snippet not found' });
+        }
+        // Verify permissions (only author OR workspace OWNER/ADMIN can update)
+        const member = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: { workspaceId: snippet.workspaceId, userId }
+            }
+        });
+        const isAuthor = snippet.authorId === userId;
+        const isAuthorized = isAuthor || (member && (member.role === 'OWNER' || member.role === 'ADMIN'));
+        if (!isAuthorized) {
+            return res.status(403).json({ error: 'Access denied: You do not have permission to update this snippet' });
+        }
+        const updatedSnippet = await prisma.snippet.update({
+            where: { id: snippetId },
+            data: {
+                title: title !== undefined ? title : snippet.title,
+                language: language !== undefined ? language : snippet.language,
+                code: code !== undefined ? code : snippet.code
+            },
+            include: {
+                author: {
+                    select: { id: true, name: true, email: true, avatarUrl: true }
+                }
+            }
+        });
+        res.json(updatedSnippet);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
