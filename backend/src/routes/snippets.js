@@ -146,37 +146,4 @@ router.delete('/:snippetId', async (req, res) => {
     }
 });
 
-
-// 4. Delete a Snippet
-router.delete('/:snippetId', async (req, res) => {
-    const { snippetId } = req.params;
-    const userId = req.user.id;
-    try {
-        const snippet = await prisma.snippet.findUnique({
-            where: { id: snippetId }
-        });
-        if (!snippet) {
-            return res.status(404).json({ error: 'Snippet not found' });
-        }
-        // Verify permissions (only author OR workspace OWNER/ADMIN can delete)
-        const member = await prisma.workspaceMember.findUnique({
-            where: {
-                workspaceId_userId: { workspaceId: snippet.workspaceId, userId }
-            }
-        });
-        const isAuthor = snippet.authorId === userId;
-        const isAuthorized = isAuthor || (member && (member.role === 'OWNER' || member.role === 'ADMIN'));
-        if (!isAuthorized) {
-            return res.status(403).json({ error: 'Access denied: You do not have permission to delete this snippet' });
-        }
-        await prisma.snippet.delete({
-            where: { id: snippetId }
-        });
-        res.json({ message: 'Snippet deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
 export default router;
