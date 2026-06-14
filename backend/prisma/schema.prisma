@@ -23,6 +23,7 @@ model User {
   workspaces   Workspace[]       @relation("WorkspaceOwner")
   memberships  WorkspaceMember[]
   messages     Message[]
+  snippets     Snippet[]
 
   @@map("users")
 }
@@ -37,6 +38,7 @@ model Workspace {
   updatedAt   DateTime          @updatedAt
   members     WorkspaceMember[]
   channels    Channel[]
+  snippets    Snippet[]
 
   @@map("workspaces")
 }
@@ -88,40 +90,6 @@ model Message {
   @@map("messages")
 }
 
-// 1. Add snippets array inside the User model:
-model User {
-  id           String            @id @default(uuid())
-  name         String
-  email        String            @unique
-  passwordHash String
-  avatarUrl    String?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  workspaces   Workspace[]       @relation("WorkspaceOwner")
-  memberships  WorkspaceMember[]
-  messages     Message[]
-  snippets     Snippet[]
-
-  @@map("users")
-}
-
-// 2. Add snippets array inside the Workspace model:
-model Workspace {
-  id          String            @id @default(uuid())
-  name        String
-  description String?
-  ownerId     String
-  owner       User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  members     WorkspaceMember[]
-  channels    Channel[]
-  snippets    Snippet[]
-
-  @@map("workspaces")
-}
-
-// 3. Add the Snippet model at the bottom of the schema:
 model Snippet {
   id          String   @id @default(uuid())
   workspaceId String   @map("workspace_id")
@@ -131,9 +99,7 @@ model Snippet {
   code        String
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
   @@map("snippets")
 }
