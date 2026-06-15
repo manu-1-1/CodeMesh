@@ -10,10 +10,10 @@ Here is a visual map showing how the backend files interact to handle an authent
 
 ```mermaid
 flowchart TD
-    Client[Client Browser / PowerShell] -- 1. Sends HTTP Request --> Server[backend/src/index.js]
+    Client[Client Browser / PowerShell] -- "1. Sends HTTP Request" --> Server[backend/src/index.js]
     
     subgraph Express Routing & Middleware
-        Server -- 2. Routes "/api/v1/auth/*" --> Router[backend/src/routes/auth.js]
+        Server -- "2. Routes /api/v1/auth/*" --> Router[backend/src/routes/auth.js]
         Router -- "3. Protects Route (/me)" --> Middleware[backend/src/middleware/auth.js]
     end
     
@@ -99,9 +99,9 @@ node_modules/
 ```env
 DATABASE_URL="postgresql://postgres:op%40098@localhost:5432/codemesh?schema=public"
 PORT=5000
-JWT_SECRET="secret"
+JWT_SECRET="your-long-random-secret-key
 ```
-* **`DATABASE_URL`**: Connects to the PostgreSQL instance running locally. The `@` character in the password `op@098` was URL-encoded to `%40` so it doesn't break URL path parsing.
+* **`DATABASE_URL`**: Connects to the PostgreSQL instance running locally. The `@` character in the password `your_password` and it should be URL-encoded so it doesn't break URL path parsing.
 * **`JWT_SECRET`**: A private key used by the cryptographic algorithm to sign and verify our authentication tokens.
 
 ---
