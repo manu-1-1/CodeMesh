@@ -1,0 +1,90 @@
+=== Testing Snippet CRUD & Permission Endpoints ===
+
+1. Setting up users and workspaces...
+✅ Setup complete.
+
+2. Creating a snippet as workspace member...
+Status: 201 {
+  id: '66d3f44a-1118-4908-9219-cc4dc060bba7',
+  workspaceId: 'bf6bf69c-a755-4ada-985d-d5deec090645',
+  authorId: '4679a54e-a1ba-48df-9b09-8190b21356d1',
+  title: 'Bubble Sort',
+  language: 'javascript',
+  code: "console.log('bubble sort');",
+  createdAt: '2026-06-15T17:20:39.771Z',
+  updatedAt: '2026-06-15T17:20:39.771Z',
+  author: {
+    id: '4679a54e-a1ba-48df-9b09-8190b21356d1',
+    name: 'Snippet Member',
+    email: 'member_1781544039550@example.com',
+    avatarUrl: null
+  }
+}
+✅ Snippet created successfully.
+
+3. Stranger attempting to create snippet (should fail)...
+Status: 403 { error: 'Access denied: You are not a member of this workspace' }
+✅ Correctly blocked stranger from creating a snippet.
+
+4. Retrieving snippet details as owner...
+Status: 200 {
+  id: '66d3f44a-1118-4908-9219-cc4dc060bba7',
+  workspaceId: 'bf6bf69c-a755-4ada-985d-d5deec090645',
+  authorId: '4679a54e-a1ba-48df-9b09-8190b21356d1',
+  title: 'Bubble Sort',
+  language: 'javascript',
+  code: "console.log('bubble sort');",
+  createdAt: '2026-06-15T17:20:39.771Z',
+  updatedAt: '2026-06-15T17:20:39.771Z',
+  author: {
+    id: '4679a54e-a1ba-48df-9b09-8190b21356d1',
+    name: 'Snippet Member',
+    email: 'member_1781544039550@example.com',
+    avatarUrl: null
+  }
+}
+✅ Snippet details retrieved successfully.
+
+5. Stranger trying to fetch snippet details (should fail)...
+Status: 403 { error: 'Access denied: You are not a member of this workspace' }
+✅ Correctly blocked stranger from viewing snippet.
+
+6. Updating snippet title and code as author...
+Status: 200 {
+  id: '66d3f44a-1118-4908-9219-cc4dc060bba7',
+  workspaceId: 'bf6bf69c-a755-4ada-985d-d5deec090645',
+  authorId: '4679a54e-a1ba-48df-9b09-8190b21356d1',
+  title: 'Improved Bubble Sort',
+  language: 'javascript',
+  code: "console.log('faster bubble sort');",
+  createdAt: '2026-06-15T17:20:39.771Z',
+  updatedAt: '2026-06-15T17:20:39.787Z',
+  author: {
+    id: '4679a54e-a1ba-48df-9b09-8190b21356d1',
+    name: 'Snippet Member',
+    email: 'member_1781544039550@example.com',
+    avatarUrl: null
+  }
+}
+✅ Snippet successfully updated by author.
+
+7. Stranger attempting to update snippet (should fail)...
+Status: 403 {
+  error: 'Access denied: You do not have permission to update this snippet'
+}
+✅ Correctly blocked stranger from updating snippet.
+
+8. Stranger trying to delete snippet (should fail)...
+Status: 403 {
+  error: 'Access denied: You do not have permission to delete this snippet'
+}
+✅ Correctly blocked stranger from deleting snippet.
+
+9. Deleting snippet as workspace owner...
+Status: 200 { message: 'Snippet deleted successfully' }
+✅ Snippet deleted successfully by workspace owner.
+
+10. Cleaning up test workspace...
+✅ Workspace deleted successfully.
+
+✅ ALL SNIPPET TESTS PASSED SUCCESSFULLY!
