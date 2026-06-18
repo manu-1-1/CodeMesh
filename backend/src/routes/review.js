@@ -49,3 +49,34 @@ router.post('/', async (req, res) => {
     }
 });
 
+// 2. Fetch review details
+router.get('/:reviewId', async (req, res) => {
+    const { reviewId } = req.params;
+    const userId = req.user.id;
+    try {
+        const review = await prisma.codeReview.findUnique({
+            where: { id: reviewId },
+            include: { snippet: true }
+        });
+        if (!review) {
+            return res.status(404).json({ error: 'Review not found' });
+        }
+        // Verify that the caller belongs to the snippet's workspace
+        const member = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId: review.snippet.workspaceId,
+                    userId
+                }
+            }
+        });
+        if (!member) {
+            return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
+        }
+        res.json(review);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+export default router;
