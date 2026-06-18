@@ -8,6 +8,8 @@ import messageRoutes from './routes/messages.js';
 import http from 'http';
 import { initSocket } from './lib/socket.js'
 import snippetRoutes from './routes/snippets.js';
+import reviewRoutes from './routes/reviews.js';
+
 
 
 const app = express();
@@ -26,6 +28,9 @@ app.use('/api/v1/channels', channelRoutes);
 app.use('/api/v1/channels', messageRoutes);
 // Snippet routes registration
 app.use('/api/v1/snippets', snippetRoutes);
+// Reviews route registration
+app.use('/api/v1/reviews', reviewRoutes);
+
 
 
 // Health check endpoint
