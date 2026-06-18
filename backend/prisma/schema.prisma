@@ -101,5 +101,18 @@ model Snippet {
   updatedAt   DateTime @updatedAt @map("updated_at")
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reviews     CodeReview[]
   @@map("snippets")
+}
+
+model CodeReview {
+  id           String   @id @default(uuid())
+  snippetId    String   @map("snippet_id")
+  summary      String
+  reviewerType String   @map("reviewer_type")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  snippet      Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+
+  @@map("code_reviews")
 }
