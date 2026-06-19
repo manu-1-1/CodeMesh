@@ -29,3 +29,32 @@ router.put('/profile', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// 2. Change Password
+router.put('/password', async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user.id;
+    if (!oldPassword || !newPassword) {
+        return res.status(400).json({ error: 'Both oldPassword and newPassword are required' });
+    }
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+        });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const isMatch = await comparePassword(oldPassword, user.passwordHash);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Incorrect old password' });
+        }
+        const newHashed = await hashPassword(newPassword);
+        await prisma.user.update({
+            where: { id: userId },
+            data: { passwordHash: newHashed },
+        });
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
