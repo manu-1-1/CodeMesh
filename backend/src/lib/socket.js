@@ -212,6 +212,53 @@ export function initSocket(server) {
         });
 
 
+        // Handle deleting a message
+        socket.on('delete_message', async ({ messageId }) => {
+            if (!messageId) {
+                socket.emit('error', { message: 'Message ID is required' });
+                return;
+            }
+            try {
+                const message = await prisma.message.findUnique({
+                    where: { id: messageId },
+                    include: {
+                        channel: true,
+                    },
+                });
+                if (!message) {
+                    socket.emit('error', { message: 'Message not found' });
+                    return;
+                }
+                const isAuthor = message.senderId === socket.userId;
+                // Check workspace membership and role
+                const member = await prisma.workspaceMember.findUnique({
+                    where: {
+                        workspaceId_userId: {
+                            workspaceId: message.channel.workspaceId,
+                            userId: socket.userId,
+                        },
+                    },
+                });
+                // Deletion permission: Sender, Owner, or Admin
+                const isAuthorized = isAuthor || (member && (member.role === 'OWNER' || member.role === 'ADMIN'));
+                if (!isAuthorized) {
+                    socket.emit('error', { message: 'Access denied: You do not have permission to delete this message' });
+                    return;
+                }
+                await prisma.message.delete({
+                    where: { id: messageId },
+                });
+                io.to(`channel:${message.channelId}`).emit('message_deleted', {
+                    messageId,
+                    channelId: message.channelId,
+                });
+                console.log(`✉️ Message ${messageId} deleted by user:${socket.userId}`);
+            } catch (error) {
+                console.error("Error in delete_message event:", error);
+                socket.emit('error', { message: error.message });
+            }
+        });
+
 
         socket.on('disconnect', () => {
             console.log(`🔌 Client disconnected: ${socket.id} (User: ${socket.userId})`);
