@@ -405,4 +405,39 @@ router.delete('/:workspaceId/members/:userId', async (req, res) => {
     }
 });
 
+// Leave workspace
+router.post('/:workspaceId/leave', async (req, res) => {
+    const { workspaceId } = req.params;
+    const userId = req.user.id;
+    try {
+        const member = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId,
+                    userId,
+                },
+            },
+        });
+        if (!member) {
+            return res.status(400).json({ error: 'You are not a member of this workspace' });
+        }
+        // Prevent Owner from leaving
+        if (member.role === 'OWNER') {
+            return res.status(400).json({ error: 'The workspace owner cannot leave. You must transfer ownership or delete the workspace' });
+        }
+        await prisma.workspaceMember.delete({
+            where: {
+                workspaceId_userId: {
+                    workspaceId,
+                    userId,
+                },
+            },
+        });
+        res.json({ message: 'Successfully left the workspace' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 export default router;
