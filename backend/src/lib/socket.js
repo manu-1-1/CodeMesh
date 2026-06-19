@@ -167,6 +167,52 @@ export function initSocket(server) {
             }
         });
 
+        // Handle editing a message
+        socket.on('edit_message', async ({ messageId, content }) => {
+            if (!messageId || !content || content.trim() === '') {
+                socket.emit('error', { message: 'Message ID and content are required' });
+                return;
+            }
+            try {
+                const message = await prisma.message.findUnique({
+                    where: { id: messageId },
+                });
+                if (!message) {
+                    socket.emit('error', { message: 'Message not found' });
+                    return;
+                }
+                // Only original sender can edit
+                if (message.senderId !== socket.userId) {
+                    socket.emit('error', { message: 'Access denied: You can only edit your own messages' });
+                    return;
+                }
+                const updatedMessage = await prisma.message.update({
+                    where: { id: messageId },
+                    data: {
+                        content: content.trim(),
+                        edited: true,
+                    },
+                    include: {
+                        sender: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                avatarUrl: true,
+                            },
+                        },
+                    },
+                });
+                io.to(`channel:${message.channelId}`).emit('message_edited', updatedMessage);
+                console.log(`✉️ Message ${messageId} edited by user:${socket.userId}`);
+            } catch (error) {
+                console.error("Error in edit_message event:", error);
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+
+
         socket.on('disconnect', () => {
             console.log(`🔌 Client disconnected: ${socket.id} (User: ${socket.userId})`);
         });
