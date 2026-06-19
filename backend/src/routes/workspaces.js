@@ -439,5 +439,73 @@ router.post('/:workspaceId/leave', async (req, res) => {
     }
 });
 
+// Update member role (Assign role)
+router.put('/:workspaceId/members/:userId', async (req, res) => {
+    const { workspaceId, userId: targetUserId } = req.params;
+    const { role } = req.body;
+    const callerId = req.user.id;
+    if (!role) {
+        return res.status(400).json({ error: 'Role is required' });
+    }
+    const validRoles = ['ADMIN', 'MEMBER'];
+    const targetRole = role.toUpperCase();
+    if (!validRoles.includes(targetRole)) {
+        return res.status(400).json({ error: 'Invalid role. Must be ADMIN or MEMBER' });
+    }
+    try {
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+        });
+        if (!workspace) {
+            return res.status(404).json({ error: 'Workspace not found' });
+        }
+        // Only Workspace OWNER can manage administrative roles
+        if (workspace.ownerId !== callerId) {
+            return res.status(403).json({ error: 'Access denied: Only the workspace owner can change member roles' });
+        }
+        const targetMember = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId,
+                    userId: targetUserId,
+                },
+            },
+        });
+        if (!targetMember) {
+            return res.status(404).json({ error: 'Member not found in this workspace' });
+        }
+        if (targetMember.role === 'OWNER') {
+            return res.status(400).json({ error: 'Cannot modify the role of the workspace owner' });
+        }
+        const updatedMember = await prisma.workspaceMember.update({
+            where: {
+                workspaceId_userId: {
+                    workspaceId,
+                    userId: targetUserId,
+                },
+            },
+            data: {
+                role: targetRole,
+            },
+            select: {
+                role: true,
+                joinedAt: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    },
+                },
+            },
+        });
+        res.json({
+            message: 'Member role updated successfully',
+            member: updatedMember,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 export default router;
