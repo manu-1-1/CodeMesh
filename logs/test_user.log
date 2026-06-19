@@ -1,0 +1,49 @@
+﻿=== Testing MVP Extensions & Message Editing/Deletion ===
+
+1. Registering users...
+Γ£à Users registered.
+
+2. Testing profile update...
+Status: 200 {
+  message: 'Profile updated successfully',
+  user: {
+    id: '4a701fa8-1875-4652-a34d-835729026f9c',
+    name: 'Updated Ext Owner',
+    email: 'owner_1781897741735@example.com',
+    avatarUrl: 'https://avatar.com/owner',
+    createdAt: '2026-06-19T19:35:41.837Z'
+  }
+}
+Γ£à Profile updated successfully.
+
+3. Testing password update...
+Status: 200 { message: 'Password updated successfully' }
+Γ£à Password updated & verified successfully.
+
+4. Creating workspace...
+Inviting member...
+Promoting member to ADMIN...
+Status: 200 {
+  message: 'Member role updated successfully',
+  member: {
+    role: 'ADMIN',
+    joinedAt: '2026-06-19T19:35:42.073Z',
+    user: {
+      id: 'b065ae6d-6ace-4b9c-a6b6-7d7e4ce40970',
+      name: 'Ext Member',
+      email: 'member_1781897741735@example.com'
+    }
+  }
+}
+Γ£à Member promoted to ADMIN successfully.
+Testing leave workspace...
+Status: 200 { message: 'Successfully left the workspace' }
+Γ£à Member successfully left workspace.
+
+5. Testing message edit & delete via Sockets...
+Γ£à Received message_edited event in real-time. Content: Edited message content
+Γ£à Received message_deleted event in real-time for message ID: 70cf0efe-c477-489a-b8a7-2e31ad714712
+
+6. Cleaning up test workspace...
+
+Γ£à ALL EXTENSION TESTS PASSED SUCCESSFULLY!
