@@ -81,6 +81,7 @@ model Message {
   content   String
   channelId String   @map("channel_id")
   senderId  String   @map("sender_id")
+   edited    Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
