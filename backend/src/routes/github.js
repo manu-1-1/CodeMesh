@@ -31,5 +31,24 @@ router.post('/connect', async (req, res) => {
     }
 });
 
+// 2. Disconnect GitHub Account (DELETE /api/v1/github/disconnect)
+router.delete('/disconnect', async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const existing = await prisma.gitHubConnection.findUnique({
+            where: { userId }
+        });
+        if (!existing) {
+            return res.status(404).json({ error: 'No connected GitHub account found' });
+        }
+        await prisma.gitHubConnection.delete({
+            where: { userId }
+        });
+        res.json({ message: 'GitHub account disconnected successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 export default router;
