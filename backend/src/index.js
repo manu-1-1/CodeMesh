@@ -10,6 +10,7 @@ import { initSocket } from './lib/socket.js'
 import snippetRoutes from './routes/snippets.js';
 import reviewRoutes from './routes/reviews.js';
 import userRoutes from './routes/users.js';
+import githubRoutes from './routes/github.js';
 
 
 const app = express();
@@ -32,6 +33,8 @@ app.use('/api/v1/snippets', snippetRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 // Users route registration
 app.use('/api/v1/users', userRoutes)
+// GitHub Integration routes registration
+app.use('/api/v1/github', githubRoutes);
 
 
 // Health check endpoint
