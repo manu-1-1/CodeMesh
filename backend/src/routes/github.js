@@ -129,6 +129,30 @@ router.post('/sync', async (req, res) => {
     }
 });
 
+// 4. List Synced Repositories for a Workspace (GET /api/v1/github/repositories)
+router.get('/repositories', async (req, res) => {
+    const { workspaceId } = req.query;
+    const userId = req.user.id;
+    if (!workspaceId) {
+        return res.status(400).json({ error: 'workspaceId query param is required' });
+    }
+    try {
+        const member = await prisma.workspaceMember.findUnique({
+            where: { workspaceId_userId: { workspaceId, userId } }
+        });
+        if (!member) {
+            return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
+        }
+        const repositories = await prisma.repository.findMany({
+            where: { workspaceId },
+            include: { pullRequests: true }
+        });
+        res.json(repositories);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
 export default router;
