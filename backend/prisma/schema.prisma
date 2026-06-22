@@ -24,6 +24,7 @@ model User {
   memberships  WorkspaceMember[]
   messages     Message[]
   snippets     Snippet[]
+  githubConnection GitHubConnection? 
 
   @@map("users")
 }
@@ -39,6 +40,7 @@ model Workspace {
   members     WorkspaceMember[]
   channels    Channel[]
   snippets    Snippet[]
+  repositories Repository[]
 
   @@map("workspaces")
 }
@@ -116,4 +118,50 @@ model CodeReview {
   snippet      Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
 
   @@map("code_reviews")
+}
+
+
+model GitHubConnection {
+  id             String   @id @default(uuid())
+  userId         String   @unique @map("user_id")
+  githubUsername String   @map("github_username")
+  accessToken    String   @map("access_token")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("github_connections")
+}
+
+model Repository {
+  id          String        @id @default(uuid())
+  workspaceId String        @map("workspace_id")
+  name        String
+  fullName    String        @map("full_name")
+  githubId    Int           @map("github_id")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  pullRequests PullRequest[]
+
+  @@unique([workspaceId, fullName])
+  @@map("repositories")
+}
+
+model PullRequest {
+  id           String     @id @default(uuid())
+  repositoryId String     @map("repository_id")
+  title        String
+  number       Int
+  state        String     // OPEN, MERGED, CLOSED
+  htmlUrl      String     @map("html_url")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([repositoryId, number])
+  @@map("pull_requests")
 }
