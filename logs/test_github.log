@@ -1,0 +1,168 @@
+=== Testing GitHub Integration ===
+1. User registered successfully.
+2. Workspace created successfully.
+
+3. Testing sync before connecting GitHub account...
+Status: 400
+Response: { error: 'Access denied: Please connect your GitHub account first' }
+✅ Successfully blocked sync for disconnected accounts.
+
+4. Connecting GitHub account...
+Status: 200
+Response: {
+  message: 'GitHub account connected successfully',
+  connection: {
+    id: '053e9c47-34df-452f-b0f9-9e3b5b8e0e32',
+    githubUsername: 'octocat',
+    createdAt: '2026-06-22T13:57:42.483Z'
+  }
+}
+✅ GitHub account connected successfully.
+
+5. Syncing repositories and PRs...
+Status: 200
+Response: {
+  "message": "Repositories and Pull Requests synchronized successfully",
+  "repositories": [
+    {
+      "id": "9cb713e2-b63d-4dac-b3af-a9ce4694e3df",
+      "workspaceId": "c6c80210-cc17-4af2-a47f-a706a4b59605",
+      "name": "api-service",
+      "fullName": "octocat/api-service",
+      "githubId": 10101,
+      "createdAt": "2026-06-22T13:57:42.488Z",
+      "updatedAt": "2026-06-22T13:57:42.488Z",
+      "pullRequests": [
+        {
+          "id": "0ab980dc-0cd1-4cdb-a8b5-2043216e0e6a",
+          "repositoryId": "9cb713e2-b63d-4dac-b3af-a9ce4694e3df",
+          "title": "Fix auth token expiry logic",
+          "number": 1,
+          "state": "OPEN",
+          "htmlUrl": "https://github.com/octocat/api-service/pull/1",
+          "createdAt": "2026-06-22T13:57:42.490Z",
+          "updatedAt": "2026-06-22T13:57:42.490Z"
+        },
+        {
+          "id": "3cb03603-bee9-48b3-b96c-ed611d616c85",
+          "repositoryId": "9cb713e2-b63d-4dac-b3af-a9ce4694e3df",
+          "title": "Add Redis caching support",
+          "number": 2,
+          "state": "CLOSED",
+          "htmlUrl": "https://github.com/octocat/api-service/pull/2",
+          "createdAt": "2026-06-22T13:57:42.491Z",
+          "updatedAt": "2026-06-22T13:57:42.491Z"
+        }
+      ]
+    },
+    {
+      "id": "f6fc915a-1b2e-4558-b71f-a59ec7bc44c8",
+      "workspaceId": "c6c80210-cc17-4af2-a47f-a706a4b59605",
+      "name": "frontend-app",
+      "fullName": "octocat/frontend-app",
+      "githubId": 10102,
+      "createdAt": "2026-06-22T13:57:42.492Z",
+      "updatedAt": "2026-06-22T13:57:42.492Z",
+      "pullRequests": [
+        {
+          "id": "8e0c634e-a41a-4904-9b32-6cbf105be13a",
+          "repositoryId": "f6fc915a-1b2e-4558-b71f-a59ec7bc44c8",
+          "title": "Fix auth token expiry logic",
+          "number": 1,
+          "state": "OPEN",
+          "htmlUrl": "https://github.com/octocat/frontend-app/pull/1",
+          "createdAt": "2026-06-22T13:57:42.493Z",
+          "updatedAt": "2026-06-22T13:57:42.493Z"
+        },
+        {
+          "id": "cfe0e795-b730-42cd-87a2-24464a9b7ce3",
+          "repositoryId": "f6fc915a-1b2e-4558-b71f-a59ec7bc44c8",
+          "title": "Add Redis caching support",
+          "number": 2,
+          "state": "CLOSED",
+          "htmlUrl": "https://github.com/octocat/frontend-app/pull/2",
+          "createdAt": "2026-06-22T13:57:42.493Z",
+          "updatedAt": "2026-06-22T13:57:42.493Z"
+        }
+      ]
+    }
+  ]
+}
+✅ Repositories and PRs synced successfully.
+
+6. Retrieving synced repositories...
+Status: 200
+Synced repositories listing: [
+  {
+    "id": "9cb713e2-b63d-4dac-b3af-a9ce4694e3df",
+    "workspaceId": "c6c80210-cc17-4af2-a47f-a706a4b59605",
+    "name": "api-service",
+    "fullName": "octocat/api-service",
+    "githubId": 10101,
+    "createdAt": "2026-06-22T13:57:42.488Z",
+    "updatedAt": "2026-06-22T13:57:42.488Z",
+    "pullRequests": [
+      {
+        "id": "0ab980dc-0cd1-4cdb-a8b5-2043216e0e6a",
+        "repositoryId": "9cb713e2-b63d-4dac-b3af-a9ce4694e3df",
+        "title": "Fix auth token expiry logic",
+        "number": 1,
+        "state": "OPEN",
+        "htmlUrl": "https://github.com/octocat/api-service/pull/1",
+        "createdAt": "2026-06-22T13:57:42.490Z",
+        "updatedAt": "2026-06-22T13:57:42.490Z"
+      },
+      {
+        "id": "3cb03603-bee9-48b3-b96c-ed611d616c85",
+        "repositoryId": "9cb713e2-b63d-4dac-b3af-a9ce4694e3df",
+        "title": "Add Redis caching support",
+        "number": 2,
+        "state": "CLOSED",
+        "htmlUrl": "https://github.com/octocat/api-service/pull/2",
+        "createdAt": "2026-06-22T13:57:42.491Z",
+        "updatedAt": "2026-06-22T13:57:42.491Z"
+      }
+    ]
+  },
+  {
+    "id": "f6fc915a-1b2e-4558-b71f-a59ec7bc44c8",
+    "workspaceId": "c6c80210-cc17-4af2-a47f-a706a4b59605",
+    "name": "frontend-app",
+    "fullName": "octocat/frontend-app",
+    "githubId": 10102,
+    "createdAt": "2026-06-22T13:57:42.492Z",
+    "updatedAt": "2026-06-22T13:57:42.492Z",
+    "pullRequests": [
+      {
+        "id": "8e0c634e-a41a-4904-9b32-6cbf105be13a",
+        "repositoryId": "f6fc915a-1b2e-4558-b71f-a59ec7bc44c8",
+        "title": "Fix auth token expiry logic",
+        "number": 1,
+        "state": "OPEN",
+        "htmlUrl": "https://github.com/octocat/frontend-app/pull/1",
+        "createdAt": "2026-06-22T13:57:42.493Z",
+        "updatedAt": "2026-06-22T13:57:42.493Z"
+      },
+      {
+        "id": "cfe0e795-b730-42cd-87a2-24464a9b7ce3",
+        "repositoryId": "f6fc915a-1b2e-4558-b71f-a59ec7bc44c8",
+        "title": "Add Redis caching support",
+        "number": 2,
+        "state": "CLOSED",
+        "htmlUrl": "https://github.com/octocat/frontend-app/pull/2",
+        "createdAt": "2026-06-22T13:57:42.493Z",
+        "updatedAt": "2026-06-22T13:57:42.493Z"
+      }
+    ]
+  }
+]
+✅ Successfully listed synced repositories.
+
+7. Disconnecting GitHub account...
+Status: 200
+✅ GitHub account disconnected successfully.
+
+8. Cleaning up workspace...
+✅ Cleaned up successfully.
+
+✅ ALL GITHUB INTEGRATION TESTS PASSED SUCCESSFULLY!
