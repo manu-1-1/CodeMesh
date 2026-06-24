@@ -26,7 +26,8 @@ export default function Auth({ onAuthSuccess }) {
             const endpoint = isLogin ? '/auth/login' : '/auth/register';
             const body = isLogin
                 ? { email: formData.email, password: formData.password }
-                : { username: formData.username, email: formData.email, password: formData.password };
+                : { name: formData.username, email: formData.email, password: formData.password };
+
             const data = await apiRequest(endpoint, {
                 method: 'POST',
                 body: JSON.stringify(body),

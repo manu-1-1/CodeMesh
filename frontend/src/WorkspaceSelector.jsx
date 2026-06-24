@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiRequest } from '../api';
+import { apiRequest } from './api';
 import './WorkspaceSelector.css';
 
 export default function WorkspaceSelector({ onSelectWorkspace, onLogout }) {
