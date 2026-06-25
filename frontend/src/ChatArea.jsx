@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { apiRequest } from './api';
 import './ChatArea.css'; // Importing its own separate stylesheet
+import SnippetsArea from './SnippetsArea';
+
 
 export default function ChatArea({ workspace, onBackToWorkspaces, currentUser }) {
     const [channels, setChannels] = useState([]);
@@ -11,6 +13,7 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser })
     const [messageInput, setMessageInput] = useState('');
     const [showChannelModal, setShowChannelModal] = useState(false);
     const [newChannelName, setNewChannelName] = useState('');
+    const [activeTab, setActiveTab] = useState('chat');
     const [error, setError] = useState('');
 
     const socketRef = useRef(null);
@@ -144,6 +147,19 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser })
         return name.substring(0, 2).toUpperCase();
     };
 
+    if (activeTab === 'snippets') {
+        return (
+            <SnippetsArea
+                workspace={workspace}
+                currentUser={currentUser}
+                onBackToWorkspaces={onBackToWorkspaces}
+                members={members}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+            />
+        );
+    }
+
     return (
         <div className="chat-screen-layout">
             {/* Sidebar */}
@@ -154,6 +170,21 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser })
                         ←
                     </button>
                 </header>
+
+                <div className="sidebar-tabs">
+                    <button
+                        className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('chat')}
+                    >
+                        💬 Chat
+                    </button>
+                    <button
+                        className={`tab-btn ${activeTab === 'snippets' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('snippets')}
+                    >
+                        💻 Snippets
+                    </button>
+                </div>
 
                 <div className="sidebar-section">
                     {/* Channels Header */}
