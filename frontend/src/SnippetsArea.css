@@ -1,0 +1,350 @@
+.snippets-main {
+    flex-grow: 1;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+}
+
+.snippets-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    height: 100%;
+}
+
+/* Sidebar Modifications */
+.search-box-wrapper {
+    padding: 0 4px;
+    margin-bottom: 16px;
+}
+
+.search-box-wrapper .search-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 13px;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    outline: none;
+    transition: var(--transition);
+}
+
+.search-box-wrapper .search-input:focus {
+    border-color: var(--border-focus);
+}
+
+.snippet-icon {
+    font-size: 16px;
+    margin-right: 12px;
+}
+
+.snippet-item-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.snippet-title {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.snippet-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    text-transform: uppercase;
+}
+
+/* Panels */
+.code-viewer-panel,
+.review-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-right: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+}
+
+.review-panel {
+    border-right: none;
+    background-color: var(--bg-secondary);
+}
+
+.panel-header {
+    height: 72px;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-secondary);
+    flex-shrink: 0;
+}
+
+.panel-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.panel-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.badge-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.language-badge {
+    font-size: 10px;
+    background-color: var(--border-color);
+    color: var(--accent-blue);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.author-name {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Editor Container styling */
+.editor-container {
+    flex-grow: 1;
+    display: flex;
+    overflow: auto;
+    background-color: #0b0c0f;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 20px 0;
+}
+
+.line-numbers {
+    width: 50px;
+    text-align: right;
+    padding-right: 15px;
+    color: #4b526d;
+    user-select: none;
+    border-right: 1px solid #1e2030;
+}
+
+.line-num {
+    height: 22.4px;
+    /* Matches code line-height */
+}
+
+.code-block {
+    flex-grow: 1;
+    padding-left: 20px;
+    margin: 0;
+    color: #a9b1d6;
+    overflow-x: auto;
+}
+
+.code-block code {
+    font-family: var(--font-mono);
+    white-space: pre;
+}
+
+/* AI Reviews Container */
+.review-content {
+    flex-grow: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.review-session-card {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+}
+
+.review-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: var(--accent-blue);
+}
+
+.findings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.finding-card {
+    padding: 14px 16px;
+    border-radius: 6px;
+    border-left: 4px solid;
+    line-height: 1.5;
+}
+
+.finding-security {
+    background-color: rgba(239, 68, 68, 0.05);
+    border-color: var(--accent-error);
+}
+
+.finding-security .finding-badge {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.finding-style {
+    background-color: rgba(245, 158, 11, 0.05);
+    border-color: #f59e0b;
+}
+
+.finding-style .finding-badge {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+.finding-quality {
+    background-color: rgba(16, 185, 129, 0.05);
+    border-color: var(--accent-success);
+}
+
+.finding-quality .finding-badge {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+.finding-header {
+    margin-bottom: 6px;
+}
+
+.finding-badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.finding-text {
+    font-size: 13.5px;
+    color: var(--text-primary);
+}
+
+/* Empty states & Buttons */
+.review-empty,
+.snippets-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 0 40px;
+}
+
+.snippets-empty-state {
+    height: 100vh;
+}
+
+.review-empty .empty-icon,
+.snippets-empty-state .icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.review-empty h4,
+.snippets-empty-state h2 {
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.review-empty p,
+.snippets-empty-state p {
+    font-size: 14px;
+    max-width: 340px;
+}
+
+.btn-danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--accent-error);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-danger:hover {
+    background-color: var(--accent-error);
+    color: white;
+}
+
+.run-review-btn {
+    width: auto;
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+/* Modal textareas */
+.code-textarea {
+    min-height: 200px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    resize: vertical;
+}
+
+.snippet-modal {
+    max-width: 600px;
+}
+
+/* Loading Cards & Spinners */
+.loading-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 40px;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(59, 130, 246, 0.1);
+    border-top: 3px solid var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
