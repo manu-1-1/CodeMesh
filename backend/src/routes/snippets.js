@@ -42,7 +42,39 @@ router.post('/', async (req, res) => {
     }
 });
 
-// 2. Get a Snippet
+// 2. Get All Snippets in a Workspace
+router.get('/', async (req, res) => {
+    const { workspaceId } = req.query;
+    const userId = req.user.id;
+    if (!workspaceId) {
+        return res.status(400).json({ error: 'workspaceId query parameter is required' });
+    }
+    try {
+        // Verify user is a member of the workspace
+        const member = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: { workspaceId, userId }
+            }
+        });
+        if (!member) {
+            return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
+        }
+        const snippets = await prisma.snippet.findMany({
+            where: { workspaceId },
+            include: {
+                author: {
+                    select: { id: true, name: true, email: true, avatarUrl: true }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+        res.json(snippets);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 3. Get a Snippet
 router.get('/:snippetId', async (req, res) => {
     const { snippetId } = req.params;
     const userId = req.user.id;
@@ -52,6 +84,9 @@ router.get('/:snippetId', async (req, res) => {
             include: {
                 author: {
                     select: { id: true, name: true, email: true, avatarUrl: true }
+                },
+                reviews: {
+                    orderBy: { createdAt: 'desc' }
                 }
             }
         });
@@ -73,7 +108,7 @@ router.get('/:snippetId', async (req, res) => {
     }
 });
 
-// 3. Update a Snippet
+// 4. Update a Snippet
 router.put('/:snippetId', async (req, res) => {
     const { snippetId } = req.params;
     const { title, language, code } = req.body;
@@ -115,7 +150,7 @@ router.put('/:snippetId', async (req, res) => {
     }
 });
 
-// 4. Delete a Snippet
+// 5. Delete a Snippet
 router.delete('/:snippetId', async (req, res) => {
     const { snippetId } = req.params;
     const userId = req.user.id;
