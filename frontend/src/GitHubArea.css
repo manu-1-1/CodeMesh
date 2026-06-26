@@ -1,0 +1,366 @@
+.github-loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    color: var(--text-secondary);
+}
+
+.github-loading-state .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: github-spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes github-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.btn-sync-refresh {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: var(--transition);
+    color: var(--text-secondary);
+}
+
+.btn-sync-refresh:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.sidebar-empty-info {
+    padding: 12px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Connect container */
+.github-connect-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    padding: 40px;
+    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.04), transparent 40%);
+}
+
+.github-connect-card {
+    width: 100%;
+    max-width: 440px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 40px 32px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.github-logo-badge {
+    font-size: 40px;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #1f2937, #111827);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px auto;
+}
+
+.github-connect-card h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.github-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+.github-form {
+    text-align: left;
+}
+
+.form-helper {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+.error-banner {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--accent-error);
+    border-radius: var(--border-radius);
+    padding: 12px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+/* Content layout */
+.github-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.github-content-layout {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.repo-details-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 32px;
+    height: 100%;
+}
+
+.repo-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+}
+
+.repo-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.repo-icon {
+    font-size: 28px;
+}
+
+.repo-title-wrapper h2 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.repo-fullname {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.btn-github-link {
+    display: inline-block;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: var(--border-radius);
+    font-size: 13px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn-github-link:hover {
+    background-color: var(--border-color);
+}
+
+.pr-list-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.pr-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.pr-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 150px;
+    transition: var(--transition);
+}
+
+.pr-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-focus);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.pr-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.pr-number {
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--accent-blue);
+    font-size: 13px;
+}
+
+.pr-status-badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.status-open {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--accent-success);
+}
+
+.status-closed {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--accent-error);
+}
+
+.status-merged {
+    background-color: rgba(139, 92, 246, 0.1);
+    color: #a78bfa;
+}
+
+.pr-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.btn-pr-link {
+    display: inline-block;
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.btn-pr-link:hover {
+    color: var(--accent-blue-hover);
+    text-decoration: underline;
+}
+
+.pr-empty-state {
+    padding: 40px;
+    text-align: center;
+    background-color: var(--bg-secondary);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-muted);
+}
+
+/* Empty Details state */
+.github-empty-details {
+    margin: auto;
+    max-width: 400px;
+    text-align: center;
+    padding: 40px;
+}
+
+.github-empty-details .icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.github-empty-details h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.github-empty-details p {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.github-status-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 16px 20px;
+    margin-bottom: 32px;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 8px 0;
+}
+
+.status-item:not(:last-child) {
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.status-label {
+    color: var(--text-secondary);
+}
+
+.status-val {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.active-badge {
+    color: var(--accent-success);
+    font-weight: 600;
+}
+
+.button-group-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-danger-outline {
+    background: none;
+    border: 1px solid var(--accent-error);
+    color: var(--accent-error);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.btn-danger-outline:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
