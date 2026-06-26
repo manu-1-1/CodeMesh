@@ -153,6 +153,26 @@ router.get('/repositories', async (req, res) => {
     }
 });
 
+// 5. Check GitHub Connection Status (GET /api/v1/github/status)
+router.get('/status', async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const connection = await prisma.gitHubConnection.findUnique({
+            where: { userId },
+            select: {
+                id: true,
+                githubUsername: true,
+                createdAt: true
+            }
+        });
+        res.json({
+            connected: !!connection,
+            connection
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 
 export default router;
