@@ -3,9 +3,11 @@ import { io } from 'socket.io-client';
 import { apiRequest } from './api';
 import './ChatArea.css'; // Importing its own separate stylesheet
 import SnippetsArea from './SnippetsArea';
+import GitHubArea from './GitHubArea';
+import SettingsArea from './SettingsArea';
 
 
-export default function ChatArea({ workspace, onBackToWorkspaces, currentUser }) {
+export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, onUserUpdate }) {
     const [channels, setChannels] = useState([]);
     const [selectedChannel, setSelectedChannel] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -157,8 +159,35 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser })
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
             />
+    }
+
+    if (activeTab === 'github') {
+        return (
+            <GitHubArea
+                workspace={workspace}
+                currentUser={currentUser}
+                onBackToWorkspaces={onBackToWorkspaces}
+                members={members}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+            />
         );
     }
+
+    if (activeTab === 'settings') {
+        return (
+            <SettingsArea
+                workspace={workspace}
+                currentUser={currentUser}
+                onBackToWorkspaces={onBackToWorkspaces}
+                members={members}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                onUserUpdate={onUserUpdate}
+            />
+        );
+    }
+
 
     return (
         <div className="chat-screen-layout">
@@ -183,6 +212,18 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser })
                         onClick={() => setActiveTab('snippets')}
                     >
                         💻 Snippets
+                    </button>
+                    <button
+                        className={`tab-btn ${activeTab === 'github' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('github')}
+                    >
+                        🐙 GitHub
+                    </button>
+                    <button
+                        className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('settings')}
+                    >
+                        ⚙️ Settings
                     </button>
                 </div>
 

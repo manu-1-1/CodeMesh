@@ -169,6 +169,18 @@ export default function SnippetsArea({ workspace, currentUser, onBackToWorkspace
                     >
                         💻 Snippets
                     </button>
+                    <button
+                        className={`tab-btn ${activeTab === 'github' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('github')}
+                    >
+                        🐙 GitHub
+                    </button>
+                    <button
+                        className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('settings')}
+                    >
+                        ⚙️ Settings
+                    </button>
                 </div>
 
                 <div className="sidebar-section">
