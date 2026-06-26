@@ -43,6 +43,7 @@ export default function App() {
       workspace={currentWorkspace}
       currentUser={user}
       onBackToWorkspaces={() => setCurrentWorkspace(null)}
+      onUserUpdate={(updatedUser) => setUser(updatedUser)}
     />
   );
 }
