@@ -159,6 +159,7 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
             />
+        );
     }
 
     if (activeTab === 'github') {
