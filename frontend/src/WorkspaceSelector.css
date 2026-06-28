@@ -118,3 +118,88 @@
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 8px;
 }
+
+/* Pending Invitations Styles */
+.invitations-section {
+    margin-bottom: 32px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 24px;
+}
+
+.invitations-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.invitations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.invitation-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 16px 20px;
+    gap: 16px;
+}
+
+.invitation-workspace-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.invitation-details {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+.invitation-role-badge {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--accent-blue);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.invitation-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-accept {
+    width: auto !important;
+    padding: 8px 20px !important;
+}
+
+.btn-decline {
+    padding: 8px 20px;
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.btn-decline:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-focus);
+}

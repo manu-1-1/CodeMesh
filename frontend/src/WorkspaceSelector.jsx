@@ -104,6 +104,40 @@ export default function WorkspaceSelector({ onSelectWorkspace, onLogout }) {
                 </button>
             </header>
             {error && <div className="alert alert-error">{error}</div>}
+
+            {/* Pending Invitations Section */}
+            {invitations.length > 0 && (
+                <div className="invitations-section">
+                    <h3 className="invitations-section-title">Pending Invitations</h3>
+                    <div className="invitations-list">
+                        {invitations.map((invite) => (
+                            <div key={invite.id} className="invitation-card">
+                                <div className="invitation-info">
+                                    <h4 className="invitation-workspace-name">{invite.workspace?.name}</h4>
+                                    <p className="invitation-details">
+                                        Invited by: <strong>{invite.invitedBy?.name || 'Someone'}</strong> as a <span className="invitation-role-badge">{invite.role}</span>
+                                    </p>
+                                </div>
+                                <div className="invitation-actions">
+                                    <button 
+                                        className="btn-primary btn-accept" 
+                                        onClick={() => handleAcceptInvitation(invite.id)}
+                                    >
+                                        Accept
+                                    </button>
+                                    <button 
+                                        className="btn-decline" 
+                                        onClick={() => handleDeclineInvitation(invite.id)}
+                                    >
+                                        Decline
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <div className="workspace-grid">
                 {workspaces.map((workspace) => (
                     <div
