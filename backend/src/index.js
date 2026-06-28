@@ -11,6 +11,7 @@ import snippetRoutes from './routes/snippets.js';
 import reviewRoutes from './routes/reviews.js';
 import userRoutes from './routes/users.js';
 import githubRoutes from './routes/github.js';
+import invitationRoutes from './routes/invitations.js';
 
 
 const app = express();
@@ -35,6 +36,8 @@ app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/users', userRoutes)
 // GitHub Integration routes registration
 app.use('/api/v1/github', githubRoutes);
+// Invitations routes registration
+app.use('/api/v1/invitations', invitationRoutes);
 
 
 // Health check endpoint
