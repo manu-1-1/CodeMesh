@@ -236,6 +236,138 @@
     line-height: 1.5;
 }
 
+/* Members Management Layout */
+.settings-members-section {
+    margin-top: 48px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 32px;
+}
+
+.settings-members-section > h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+}
+
+.members-management-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+}
+
+@media (max-width: 900px) {
+    .members-management-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.invite-desc-muted {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin-top: -16px;
+    margin-bottom: 16px;
+}
+
+.members-table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.members-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.members-table th {
+    padding: 12px 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.members-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--bg-tertiary);
+    vertical-align: middle;
+}
+
+.table-member-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.table-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 12px !important;
+    flex-shrink: 0;
+}
+
+.member-details-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.member-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.member-email {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.table-role-select {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.table-role-select:focus {
+    border-color: var(--border-focus);
+}
+
+.btn-remove-member {
+    background: none;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #f87171;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.btn-remove-member:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.action-disabled-text {
+    color: var(--text-muted);
+    font-size: 14px;
+    padding-left: 12px;
+}
+
 @media (max-width: 768px) {
     .danger-zone-card {
         flex-direction: column;

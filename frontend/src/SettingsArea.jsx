@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { apiRequest } from './api';
 import './SettingsArea.css';
 
-export default function SettingsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, onUserUpdate }) {
-    // Profile Fields
+export default function SettingsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, onUserUpdate, onMembersUpdate }) {
     const [name, setName] = useState(currentUser.name || '');
     const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || '');
 
@@ -16,6 +15,15 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
     const [profileSuccess, setProfileSuccess] = useState('');
     const [passwordSuccess, setPasswordSuccess] = useState('');
     const [error, setError] = useState('');
+
+    // Invite Member Fields
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviteRole, setInviteRole] = useState('MEMBER');
+    const [loadingInvite, setLoadingInvite] = useState(false);
+    const [inviteSuccess, setInviteSuccess] = useState('');
+    const [inviteError, setInviteError] = useState('');
+
+
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
@@ -77,6 +85,65 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
             });
             alert(`You have successfully left "${workspace.name}"`);
             onBackToWorkspaces(); // Redirect to workspace selector
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleInviteMember = async (e) => {
+        e.preventDefault();
+        if (!inviteEmail.trim()) return;
+        setLoadingInvite(true);
+        setInviteSuccess('');
+        setInviteError('');
+
+        try {
+            await apiRequest(`/workspaces/${workspace.id}/members`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: inviteEmail.trim(),
+                    role: inviteRole
+                })
+            });
+            setInviteSuccess('Member invited successfully!');
+            setInviteEmail('');
+            setInviteRole('MEMBER');
+            if (onMembersUpdate) {
+                await onMembersUpdate();
+            }
+        } catch (err) {
+            setInviteError(err.message);
+        } finally {
+            setLoadingInvite(false);
+        }
+    };
+
+    const handleRemoveMember = async (userId) => {
+        if (!window.confirm("Are you sure you want to remove this member from the workspace?")) return;
+        setError('');
+
+        try {
+            await apiRequest(`/workspaces/${workspace.id}/members/${userId}`, {
+                method: 'DELETE'
+            });
+            if (onMembersUpdate) {
+                await onMembersUpdate();
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleChangeRole = async (userId, newRole) => {
+        setError('');
+        try {
+            await apiRequest(`/workspaces/${workspace.id}/members/${userId}`, {
+                method: 'PUT',
+                body: JSON.stringify({ role: newRole })
+            });
+            if (onMembersUpdate) {
+                await onMembersUpdate();
+            }
         } catch (err) {
             setError(err.message);
         }
@@ -244,6 +311,133 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
                             </form>
                         </div>
                     </div>
+
+                    {/* Member Management Section (Visible to Owners and Admins) */}
+                    {(userRole === 'OWNER' || userRole === 'ADMIN') && (
+                        <div className="settings-members-section">
+                            <h3>Workspace Member Management</h3>
+                            <div className="members-management-grid">
+                                {/* Left Side: Invite Form */}
+                                <div className="settings-card invite-card">
+                                    <h3>Invite New Member</h3>
+                                    <p className="invite-desc-muted">Add team members to this workspace by their email address.</p>
+                                    <form onSubmit={handleInviteMember} className="settings-form">
+                                        <div className="form-group">
+                                            <label className="form-label">Email Address</label>
+                                            <input
+                                                type="email"
+                                                className="form-input"
+                                                placeholder="colleague@example.com"
+                                                value={inviteEmail}
+                                                onChange={(e) => setInviteEmail(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Workspace Role</label>
+                                            <select
+                                                className="form-input"
+                                                value={inviteRole}
+                                                onChange={(e) => setInviteRole(e.target.value)}
+                                            >
+                                                <option value="MEMBER">Member</option>
+                                                <option value="ADMIN">Admin</option>
+                                            </select>
+                                        </div>
+
+                                        {inviteSuccess && <div className="success-banner">{inviteSuccess}</div>}
+                                        {inviteError && <div className="error-banner">{inviteError}</div>}
+
+                                        <button type="submit" className="btn-primary" disabled={loadingInvite} style={{ marginTop: '12px' }}>
+                                            {loadingInvite ? "Sending Invite..." : "Invite Member"}
+                                        </button>
+                                    </form>
+                                </div>
+
+                                {/* Right Side: Members List */}
+                                <div className="settings-card members-list-card">
+                                    <h3>Workspace Members ({members.length})</h3>
+                                    <div className="members-table-wrapper">
+                                        <table className="members-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Member</th>
+                                                    <th>Role</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {members.map((memberObj) => {
+                                                    const isSelf = memberObj.user.id === currentUser.id;
+                                                    const isOwner = memberObj.role === 'OWNER';
+                                                    const isTargetAdmin = memberObj.role === 'ADMIN';
+
+                                                    // Determine if current user can remove this member
+                                                    // - Owners can remove anyone except themselves
+                                                    // - Admins can remove regular MEMBERS, but not other Admins or Owners
+                                                    let canRemove = false;
+                                                    if (!isSelf && !isOwner) {
+                                                        if (userRole === 'OWNER') {
+                                                            canRemove = true;
+                                                        } else if (userRole === 'ADMIN' && !isTargetAdmin) {
+                                                            canRemove = true;
+                                                        }
+                                                    }
+
+                                                    // Only Workspace Owner can change roles
+                                                    const canChangeRole = userRole === 'OWNER' && !isSelf && !isOwner;
+
+                                                    return (
+                                                        <tr key={memberObj.user.id}>
+                                                            <td>
+                                                                <div className="table-member-info">
+                                                                    <span className="user-avatar member-avatar table-avatar">
+                                                                        {getUserInitials(memberObj.user.name)}
+                                                                    </span>
+                                                                    <div className="member-details-col">
+                                                                        <span className="member-name">{memberObj.user.name} {isSelf && "(You)"}</span>
+                                                                        <span className="member-email">{memberObj.user.email}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                {canChangeRole ? (
+                                                                    <select
+                                                                        className="table-role-select"
+                                                                        value={memberObj.role}
+                                                                        onChange={(e) => handleChangeRole(memberObj.user.id, e.target.value)}
+                                                                    >
+                                                                        <option value="MEMBER">Member</option>
+                                                                        <option value="ADMIN">Admin</option>
+                                                                    </select>
+                                                                ) : (
+                                                                    <span className={`role-badge role-${memberObj.role.toLowerCase()}`}>
+                                                                        {memberObj.role}
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                            <td>
+                                                                {canRemove ? (
+                                                                    <button
+                                                                        className="btn-remove-member"
+                                                                        onClick={() => handleRemoveMember(memberObj.user.id)}
+                                                                    >
+                                                                        Remove
+                                                                    </button>
+                                                                ) : (
+                                                                    <span className="action-disabled-text">-</span>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Workspace Actions (Danger Zone) */}
                     <div className="settings-danger-zone">
