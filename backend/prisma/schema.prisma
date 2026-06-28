@@ -25,6 +25,7 @@ model User {
   messages     Message[]
   snippets     Snippet[]
   githubConnection GitHubConnection? 
+  invitationsSent  Invitation[]      @relation("Inviter")
 
   @@map("users")
 }
@@ -41,6 +42,7 @@ model Workspace {
   channels    Channel[]
   snippets    Snippet[]
   repositories Repository[]
+  invitations  Invitation[]
 
   @@map("workspaces")
 }
@@ -165,3 +167,27 @@ model PullRequest {
   @@unique([repositoryId, number])
   @@map("pull_requests")
 }
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Invitation {
+  id          String           @id @default(uuid())
+  workspaceId String           @map("workspace_id")
+  email       String           
+  role        Role             @default(MEMBER)
+  status      InvitationStatus @default(PENDING)
+  invitedById String           @map("invited_by_id")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedBy   User             @relation("Inviter", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, email])
+  @@map("invitations")
+}
+
