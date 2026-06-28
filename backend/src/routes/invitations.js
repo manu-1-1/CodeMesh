@@ -5,6 +5,23 @@ import { authenticateToken } from '../middleware/auth.js';
 const router = express.Router();
 router.use(authenticateToken);
 
+// Load user email from DB since the JWT token payload only contains the userId
+router.use(async (req, res, next) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id },
+            select: { email: true }
+        });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        req.user.email = user.email;
+        next();
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // 1. Get all pending invitations for the logged-in user (GET /api/v1/invitations/pending)
 router.get('/pending', async (req, res) => {
     const userEmail = req.user.email;
