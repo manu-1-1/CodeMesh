@@ -316,29 +316,34 @@ router.post('/:workspaceId/members', async (req, res) => {
             return res.status(400).json({ error: 'User is already a member of this workspace' });
         }
 
-        // 4. Add the user
-        const newMember = await prisma.workspaceMember.create({
+        // 4. Check if an invitation is already pending
+        const existingInvitation = await prisma.invitation.findUnique({
+            where: {
+                workspaceId_email: {
+                    workspaceId,
+                    email: email.trim()
+                }
+            }
+        });
+
+        if (existingInvitation) {
+            return res.status(400).json({ error: 'An invitation is already pending for this email' });
+        }
+
+        // 5. Create the pending invitation
+        const invitation = await prisma.invitation.create({
             data: {
                 workspaceId,
-                userId: userToAdd.id,
+                email: email.trim(),
                 role: memberRole,
-            },
-            select: {
-                role: true,
-                joinedAt: true,
-                user: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    },
-                },
-            },
+                invitedById: userId,
+                status: 'PENDING'
+            }
         });
 
         res.status(201).json({
-            message: 'Member added successfully',
-            member: newMember,
+            message: 'Invitation sent successfully',
+            invitation,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
