@@ -4,14 +4,18 @@ import './WorkspaceSelector.css';
 
 export default function WorkspaceSelector({ onSelectWorkspace, onLogout }) {
     const [workspaces, setWorkspaces] = useState([]);
+    const [invitations, setInvitations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [newWorkspaceName, setNewWorkspaceName] = useState('');
     const [newWorkspaceDesc, setNewWorkspaceDesc] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+
     useEffect(() => {
         fetchWorkspaces();
+        fetchInvitations();
     }, []);
+
     const fetchWorkspaces = async () => {
         try {
             setLoading(true);
@@ -21,6 +25,42 @@ export default function WorkspaceSelector({ onSelectWorkspace, onLogout }) {
             setError(err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchInvitations = async () => {
+        try {
+            const data = await apiRequest('/invitations/pending');
+            setInvitations(data);
+        } catch (err) {
+            console.error('Failed to fetch pending invitations:', err);
+        }
+    };
+
+    const handleAcceptInvitation = async (invitationId) => {
+        try {
+            setError('');
+            await apiRequest(`/invitations/${invitationId}/accept`, {
+                method: 'POST'
+            });
+            alert('Invitation accepted successfully!');
+            fetchWorkspaces();
+            fetchInvitations();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleDeclineInvitation = async (invitationId) => {
+        if (!window.confirm('Are you sure you want to decline this invitation?')) return;
+        try {
+            setError('');
+            await apiRequest(`/invitations/${invitationId}/decline`, {
+                method: 'POST'
+            });
+            fetchInvitations();
+        } catch (err) {
+            setError(err.message);
         }
     };
     const handleCreateWorkspace = async (e) => {
