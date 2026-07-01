@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { apiRequest } from './api';
 import './SettingsArea.css';
 
-export default function SettingsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, onUserUpdate, onMembersUpdate }) {
+export default function SettingsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, onUserUpdate, onMembersUpdate, onWorkspaceUpdate }) {
     const [name, setName] = useState(currentUser.name || '');
     const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || '');
 
@@ -23,8 +23,59 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
     const [inviteSuccess, setInviteSuccess] = useState('');
     const [inviteError, setInviteError] = useState('');
 
+    // Workspace Management Fields (for Workspace Owner)
+    const [workspaceName, setWorkspaceName] = useState(workspace.name || '');
+    const [workspaceDesc, setWorkspaceDesc] = useState(workspace.description || '');
+    const [loadingWorkspace, setLoadingWorkspace] = useState(false);
+    const [workspaceSuccess, setWorkspaceSuccess] = useState('');
 
+    const handleUpdateWorkspace = async (e) => {
+        e.preventDefault();
+        if (!workspaceName.trim()) return;
+        setLoadingWorkspace(true);
+        setError('');
+        setWorkspaceSuccess('');
 
+        try {
+            const data = await apiRequest(`/workspaces/${workspace.id}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    name: workspaceName.trim(),
+                    description: workspaceDesc.trim()
+                })
+            });
+            setWorkspaceSuccess('Workspace details updated successfully!');
+            if (onWorkspaceUpdate) {
+                onWorkspaceUpdate(data.workspace);
+            }
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoadingWorkspace(false);
+        }
+    };
+
+    const handleDeleteWorkspace = async () => {
+        const confirmDelete = window.confirm(`WARNING: Are you sure you want to delete the workspace "${workspace.name}"? This action is permanent and all channels, messages, and settings will be permanently lost.`);
+        if (!confirmDelete) return;
+
+        const confirmDouble = window.prompt(`Please type the workspace name "${workspace.name}" to confirm deletion:`);
+        if (confirmDouble !== workspace.name) {
+            alert("Workspace name verification failed. Workspace was not deleted.");
+            return;
+        }
+
+        setError('');
+        try {
+            await apiRequest(`/workspaces/${workspace.id}`, {
+                method: 'DELETE'
+            });
+            alert(`Workspace "${workspace.name}" deleted successfully.`);
+            onBackToWorkspaces();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
         setLoadingProfile(true);
@@ -310,6 +361,44 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
                                 </button>
                             </form>
                         </div>
+
+                        {/* Workspace Settings (Owner Only) */}
+                        {userRole === 'OWNER' && (
+                            <div className="settings-card">
+                                <h3>Workspace Details</h3>
+                                <p className="invite-desc-muted" style={{ fontSize: '12px', marginBottom: '12px' }}>
+                                    Manage the public name and description of this workspace.
+                                </p>
+                                <form onSubmit={handleUpdateWorkspace} className="settings-form">
+                                    <div className="form-group">
+                                        <label className="form-label">Workspace Name</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={workspaceName}
+                                            onChange={(e) => setWorkspaceName(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Workspace Description</label>
+                                        <textarea
+                                            className="form-input"
+                                            style={{ minHeight: '60px', resize: 'vertical', fontFamily: 'inherit' }}
+                                            value={workspaceDesc}
+                                            onChange={(e) => setWorkspaceDesc(e.target.value)}
+                                            placeholder="Add a description for this workspace"
+                                        />
+                                    </div>
+
+                                    {workspaceSuccess && <div className="success-banner">{workspaceSuccess}</div>}
+
+                                    <button type="submit" className="btn-primary" disabled={loadingWorkspace}>
+                                        {loadingWorkspace ? "Saving..." : "Save Workspace Details"}
+                                    </button>
+                                </form>
+                            </div>
+                        )}
                     </div>
 
                     {/* Member Management Section (Visible to Owners and Admins) */}
@@ -443,21 +532,31 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
                     <div className="settings-danger-zone">
                         <h3>Workspace Actions</h3>
                         <div className="danger-zone-card">
-                            <div className="danger-text-info">
-                                <h4>Leave Workspace</h4>
-                                <p>Remove yourself as a member of <strong>{workspace.name}</strong>. You will lose immediate access and will need to be re-invited to join back.</p>
-                            </div>
-                            <div className="danger-action-button">
-                                {userRole === 'OWNER' ? (
-                                    <span className="owner-action-warning">
-                                        ⚠️ Workspace Owner cannot leave. Transfer ownership or delete workspace from the selector dashboard.
-                                    </span>
-                                ) : (
-                                    <button className="btn-danger" onClick={handleLeaveWorkspace}>
-                                        Leave Workspace
-                                    </button>
-                                )}
-                            </div>
+                            {userRole === 'OWNER' ? (
+                                <>
+                                    <div className="danger-text-info">
+                                        <h4>Delete Workspace</h4>
+                                        <p>Permanently delete <strong>{workspace.name}</strong> and all its channels, messages, snippets, and integrations. This action is irreversible.</p>
+                                    </div>
+                                    <div className="danger-action-button">
+                                        <button className="btn-danger" onClick={handleDeleteWorkspace}>
+                                            Delete Workspace
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="danger-text-info">
+                                        <h4>Leave Workspace</h4>
+                                        <p>Remove yourself as a member of <strong>{workspace.name}</strong>. You will lose immediate access and will need to be re-invited to join back.</p>
+                                    </div>
+                                    <div className="danger-action-button">
+                                        <button className="btn-danger" onClick={handleLeaveWorkspace}>
+                                            Leave Workspace
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
