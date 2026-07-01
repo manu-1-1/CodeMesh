@@ -8,6 +8,7 @@ import SettingsArea from './SettingsArea';
 
 
 export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, onUserUpdate, onWorkspaceUpdate }) {
+    const [channels, setChannels] = useState([]);
     const [selectedChannel, setSelectedChannel] = useState(null);
     const [messages, setMessages] = useState([]);
     const [members, setMembers] = useState([]);
