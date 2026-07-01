@@ -44,6 +44,7 @@ export default function App() {
       currentUser={user}
       onBackToWorkspaces={() => setCurrentWorkspace(null)}
       onUserUpdate={(updatedUser) => setUser(updatedUser)}
+      onWorkspaceUpdate={(updatedWs) => setCurrentWorkspace(updatedWs)}
     />
   );
 }
