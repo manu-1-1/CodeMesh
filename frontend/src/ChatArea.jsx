@@ -7,8 +7,7 @@ import GitHubArea from './GitHubArea';
 import SettingsArea from './SettingsArea';
 
 
-export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, onUserUpdate }) {
-    const [channels, setChannels] = useState([]);
+export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, onUserUpdate, onWorkspaceUpdate }) {
     const [selectedChannel, setSelectedChannel] = useState(null);
     const [messages, setMessages] = useState([]);
     const [members, setMembers] = useState([]);
@@ -186,6 +185,7 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                 setActiveTab={setActiveTab}
                 onUserUpdate={onUserUpdate}
                 onMembersUpdate={fetchMembers}
+                onWorkspaceUpdate={onWorkspaceUpdate}
             />
         );
     }
