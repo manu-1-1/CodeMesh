@@ -49,6 +49,16 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
             console.error('Socket error:', err);
         });
 
+        socketRef.current.on('message_edited', (updatedMsg) => {
+            setMessages((prev) =>
+                prev.map((msg) => (msg.id === updatedMsg.id ? updatedMsg : msg))
+            );
+        });
+
+        socketRef.current.on('message_deleted', ({ messageId }) => {
+            setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
+        });
+
         return () => {
             if (socketRef.current) {
                 socketRef.current.disconnect();
