@@ -159,6 +159,14 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
         return name.substring(0, 2).toUpperCase();
     };
 
+    const handleEditMessage = (messageId, newContent) => {
+        if (!newContent.trim()) return;
+        socketRef.current.emit('edit_message', {
+            messageId,
+            content: newContent.trim()
+        });
+    };
+
     if (activeTab === 'snippets') {
         return (
             <SnippetsArea
