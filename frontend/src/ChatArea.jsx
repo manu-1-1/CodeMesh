@@ -17,6 +17,8 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
     const [newChannelName, setNewChannelName] = useState('');
     const [activeTab, setActiveTab] = useState('chat');
     const [error, setError] = useState('');
+    const [editingMessageId, setEditingMessageId] = useState(null);
+    const [editInput, setEditInput] = useState('');
 
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
