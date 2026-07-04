@@ -321,25 +321,71 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                                     No messages here yet. Be the first to type!
                                 </div>
                             ) : (
-                                messages.map((msg) => (
-                                    <div key={msg.id} className="message-card">
-                                        <span className="user-avatar message-avatar">
-                                            {getUserInitials(msg.sender?.name || msg.sender?.username)}
-                                        </span>
-                                        <div className="message-content-wrapper">
-                                            <div className="message-meta">
-                                                <span className="message-sender">{msg.sender?.name || 'User'}</span>
-                                                <span className="message-time">
-                                                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </span>
+                                messages.map((msg) => {
+                                    const isOwnMessage = msg.senderId === currentUser.id;
+                                    const isEditing = editingMessageId === msg.id;
+                                    return (
+                                        <div key={msg.id} className="message-card">
+                                            <span className="user-avatar message-avatar">
+                                                {getUserInitials(msg.sender?.name || msg.sender?.username)}
+                                            </span>
+                                            <div className="message-content-wrapper" style={{ width: '100%' }}>
+                                                <div className="message-meta">
+                                                    <span className="message-sender">{msg.sender?.name || 'User'}</span>
+                                                    <span className="message-time">
+                                                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                    {msg.edited && <span className="message-edited-badge" style={{ fontSize: '0.75rem', opacity: 0.6, marginLeft: '6px' }}>(edited)</span>}
+                                                </div>
+
+                                                {isEditing ? (
+                                                    <form onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        handleEditMessage(msg.id, editInput);
+                                                        setEditingMessageId(null);
+                                                    }} style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                                        <input
+                                                            type="text"
+                                                            value={editInput}
+                                                            onChange={(e) => setEditInput(e.target.value)}
+                                                            className="chat-input"
+                                                            style={{ flex: 1, padding: '4px 8px', fontSize: '0.9rem' }}
+                                                        />
+                                                        <button type="submit" className="btn-primary" style={{ padding: '4px 8px', fontSize: '0.8rem' }}>Save</button>
+                                                        <button type="button" className="btn-secondary" onClick={() => setEditingMessageId(null)} style={{ padding: '4px 8px', fontSize: '0.8rem' }}>Cancel</button>
+                                                    </form>
+                                                ) : (
+                                                    <div className="message-body" style={{ display: 'flex', justifyContent: 'between', alignItems: 'center' }}>
+                                                        <span>{msg.content}</span>
+                                                        {isOwnMessage && (
+                                                            <div className="message-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setEditingMessageId(msg.id);
+                                                                        setEditInput(msg.content);
+                                                                    }}
+                                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', opacity: 0.6 }}
+                                                                >
+                                                                    ✏️
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteMessage(msg.id)}
+                                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', opacity: 0.6 }}
+                                                                >
+                                                                    🗑️
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="message-body">{msg.content}</div>
                                         </div>
-                                    </div>
-                                ))
+                                    );
+                                })
                             )}
                             <div ref={messagesEndRef} />
                         </div>
+
 
                         <form className="chat-input-area" onSubmit={handleSendMessage}>
                             <div className="chat-input-wrapper">
@@ -364,34 +410,36 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
             </main>
 
             {/* Create Channel Modal */}
-            {showChannelModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h3 className="modal-title">Create New Channel</h3>
-                        <form onSubmit={handleCreateChannel}>
-                            <div className="form-group">
-                                <label className="form-label">Channel Name</label>
-                                <input
-                                    type="text"
-                                    className="form-input"
-                                    placeholder="e.g. engineering"
-                                    value={newChannelName}
-                                    onChange={(e) => setNewChannelName(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="modal-buttons">
-                                <button type="button" className="btn-secondary" onClick={() => setShowChannelModal(false)}>
-                                    Cancel
-                                </button>
-                                <button type="submit" className="btn-primary" style={{ width: 'auto', padding: '10px 24px' }}>
-                                    Create
-                                </button>
-                            </div>
-                        </form>
+            {
+                showChannelModal && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <h3 className="modal-title">Create New Channel</h3>
+                            <form onSubmit={handleCreateChannel}>
+                                <div className="form-group">
+                                    <label className="form-label">Channel Name</label>
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        placeholder="e.g. engineering"
+                                        value={newChannelName}
+                                        onChange={(e) => setNewChannelName(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="modal-buttons">
+                                    <button type="button" className="btn-secondary" onClick={() => setShowChannelModal(false)}>
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="btn-primary" style={{ width: 'auto', padding: '10px 24px' }}>
+                                        Create
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
