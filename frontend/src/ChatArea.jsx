@@ -167,6 +167,12 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
         });
     };
 
+    const handleDeleteMessage = (messageId) => {
+        if (window.confirm("Are you sure you want to delete this message?")) {
+            socketRef.current.emit('delete_message', { messageId });
+        }
+    };
+
     if (activeTab === 'snippets') {
         return (
             <SnippetsArea
