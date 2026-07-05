@@ -415,6 +415,100 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
                             </form>
                         </div>
 
+                        {/* AI Review Configuration */}
+                        <div className="settings-card">
+                            <h3>AI Code Reviewer Settings</h3>
+                            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px' }}>
+                                Connect your own models for performing AI code reviews on shared snippets.
+                            </p>
+                            <form onSubmit={handleUpdateAiSettings} className="settings-form">
+                                <div className="form-group">
+                                    <label htmlFor="ai-provider" className="form-label">AI Provider</label>
+                                    <select
+                                        id="ai-provider"
+                                        className="form-input"
+                                        value={aiProvider}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            setAiProvider(val);
+                                            // Prepopulate default models
+                                            if (val === 'ollama') {
+                                                setAiModel('qwen2.5-coder');
+                                                setAiApiUrl('http://localhost:11434');
+                                            } else if (val === 'openai') {
+                                                setAiModel('gpt-4o');
+                                            } else if (val === 'anthropic') {
+                                                setAiModel('claude-3-5-sonnet-20241022');
+                                            } else if (val === 'gemini') {
+                                                setAiModel('gemini-1.5-flash');
+                                            } else {
+                                                setAiModel('');
+                                                setAiApiUrl('');
+                                            }
+                                        }}
+                                    >
+                                        <option value="mock">Offline / Local Scanner (Mock)</option>
+                                        <option value="ollama">Ollama (Local Offline LLM)</option>
+                                        <option value="openai">OpenAI (ChatGPT)</option>
+                                        <option value="anthropic">Anthropic (Claude)</option>
+                                        <option value="gemini">Google Gemini</option>
+                                    </select>
+                                </div>
+
+                                {aiProvider !== 'mock' && (
+                                    <>
+                                        {aiProvider === 'ollama' && (
+                                            <div className="form-group">
+                                                <label htmlFor="ai-api-url" className="form-label">Ollama Base URL</label>
+                                                <input
+                                                    id="ai-api-url"
+                                                    type="url"
+                                                    className="form-input"
+                                                    placeholder="http://localhost:11434"
+                                                    value={aiApiUrl}
+                                                    onChange={(e) => setAiApiUrl(e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div className="form-group">
+                                            <label htmlFor="ai-model" className="form-label">Model Name</label>
+                                            <input
+                                                id="ai-model"
+                                                type="text"
+                                                className="form-input"
+                                                placeholder={aiProvider === 'ollama' ? 'qwen2.5-coder' : 'Enter model string'}
+                                                value={aiModel}
+                                                onChange={(e) => setAiModel(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+
+                                        {aiProvider !== 'ollama' && (
+                                            <div className="form-group">
+                                                <label htmlFor="ai-api-key" className="form-label">API Key</label>
+                                                <input
+                                                    id="ai-api-key"
+                                                    type="password"
+                                                    className="form-input"
+                                                    placeholder={aiApiKey === '••••••••••••••••' ? '••••••••••••••••' : 'Enter your API Key secret'}
+                                                    value={aiApiKey}
+                                                    onChange={(e) => setAiApiKey(e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+                                <button type="submit" className="btn-primary" disabled={loadingAi}>
+                                    {loadingAi ? 'Saving...' : 'Save AI Settings'}
+                                </button>
+                                {aiSuccess && <span className="success-inline-msg" style={{ marginLeft: '12px', color: '#10b981', fontSize: '13px' }}>{aiSuccess}</span>}
+                            </form>
+                        </div>
+
                         {/* Workspace Settings (Owner Only) */}
                         {userRole === 'OWNER' && (
                             <div className="settings-card">
