@@ -235,6 +235,33 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
         fetchAiSettings();
     }, []);
 
+    const handleUpdateAiSettings = async (e) => {
+        e.preventDefault();
+        setLoadingAi(true);
+        setError('');
+        setAiSuccess('');
+        try {
+            await apiRequest('/users/profile', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    aiProvider,
+                    aiApiKey,
+                    aiModel,
+                    aiApiUrl
+                })
+            });
+            setAiSuccess('AI Settings updated successfully!');
+            // If API key was saved, show the masked state
+            if (aiApiKey && aiApiKey !== "••••••••••••••••") {
+                setAiApiKey("••••••••••••••••");
+            }
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoadingAi(false);
+        }
+    };
+
     return (
         <div className="chat-screen-layout">
             {/* Sidebar */}
