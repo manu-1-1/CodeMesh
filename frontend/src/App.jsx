@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Auth from './Auth';
 import WorkspaceSelector from './WorkspaceSelector';
 import ChatArea from './ChatArea';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
 import './WorkspaceSelector.css';
 
@@ -10,11 +10,6 @@ export default function WorkspaceSelector({ onSelectWorkspace, onLogout }) {
     const [newWorkspaceName, setNewWorkspaceName] = useState('');
     const [newWorkspaceDesc, setNewWorkspaceDesc] = useState('');
     const [isCreating, setIsCreating] = useState(false);
-
-    useEffect(() => {
-        fetchWorkspaces();
-        fetchInvitations();
-    }, []);
 
     const fetchWorkspaces = async () => {
         try {
@@ -36,6 +31,11 @@ export default function WorkspaceSelector({ onSelectWorkspace, onLogout }) {
             console.error('Failed to fetch pending invitations:', err);
         }
     };
+
+    useEffect(() => {
+        fetchWorkspaces();
+        fetchInvitations();
+    }, []);
 
     const handleAcceptInvitation = async (invitationId) => {
         try {
@@ -119,14 +119,14 @@ export default function WorkspaceSelector({ onSelectWorkspace, onLogout }) {
                                     </p>
                                 </div>
                                 <div className="invitation-actions">
-                                    <button 
-                                        className="btn-primary btn-accept" 
+                                    <button
+                                        className="btn-primary btn-accept"
                                         onClick={() => handleAcceptInvitation(invite.id)}
                                     >
                                         Accept
                                     </button>
-                                    <button 
-                                        className="btn-decline" 
+                                    <button
+                                        className="btn-decline"
                                         onClick={() => handleDeclineInvitation(invite.id)}
                                     >
                                         Decline

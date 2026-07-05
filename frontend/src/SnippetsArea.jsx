@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
 import './SnippetsArea.css';
-
 export default function SnippetsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab }) {
     const [snippets, setSnippets] = useState([]);
     const [selectedSnippet, setSelectedSnippet] = useState(null);
@@ -10,16 +9,10 @@ export default function SnippetsArea({ workspace, currentUser, onBackToWorkspace
     const [showModal, setShowModal] = useState(false);
     const [loadingReview, setLoadingReview] = useState(false);
     const [error, setError] = useState('');
-
     // Form fields for new snippet
     const [newTitle, setNewTitle] = useState('');
     const [newLanguage, setNewLanguage] = useState('javascript');
     const [newCode, setNewCode] = useState('');
-
-    useEffect(() => {
-        fetchSnippets();
-    }, [workspace.id]);
-
     const fetchSnippets = async () => {
         try {
             const data = await apiRequest(`/snippets?workspaceId=${workspace.id}`);
@@ -34,7 +27,6 @@ export default function SnippetsArea({ workspace, currentUser, onBackToWorkspace
             setError(err.message);
         }
     };
-
     const fetchSnippetDetails = async (snippetId) => {
         try {
             const data = await apiRequest(`/snippets/${snippetId}`);
@@ -44,6 +36,10 @@ export default function SnippetsArea({ workspace, currentUser, onBackToWorkspace
             setError(err.message);
         }
     };
+
+    useEffect(() => {
+        fetchSnippets();
+    }, [workspace.id]);
 
     const handleCreateSnippet = async (e) => {
         e.preventDefault();

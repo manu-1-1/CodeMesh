@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
 import './GitHubArea.css';
-
 export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab }) {
     const [isConnected, setIsConnected] = useState(false);
     const [githubUsername, setGithubUsername] = useState('');
@@ -10,16 +9,8 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
     const [loading, setLoading] = useState(true);
     const [syncing, setSyncing] = useState(false);
     const [error, setError] = useState('');
-
-    // Connection Form Fields
     const [usernameInput, setUsernameInput] = useState('');
     const [tokenInput, setTokenInput] = useState('');
-
-    useEffect(() => {
-        checkStatus();
-        fetchRepos();
-    }, [workspace.id]);
-
     const checkStatus = async () => {
         try {
             const data = await apiRequest('/github/status');
@@ -33,7 +24,6 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
             setLoading(false);
         }
     };
-
     const fetchRepos = async () => {
         try {
             const data = await apiRequest(`/github/repositories?workspaceId=${workspace.id}`);
@@ -45,6 +35,10 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
             setError(err.message);
         }
     };
+    useEffect(() => {
+        checkStatus();
+        fetchRepos();
+    }, [workspace.id]);
 
     const handleConnect = async (e) => {
         e.preventDefault();

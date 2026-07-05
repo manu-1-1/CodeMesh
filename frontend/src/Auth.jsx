@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { apiRequest } from './api';
 
 export default function Auth({ onAuthSuccess }) {
