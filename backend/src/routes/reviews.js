@@ -33,8 +33,21 @@ router.post('/', async (req, res) => {
         if (!member) {
             return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
         }
+
+        // Fetch this specific user's AI settings directly from the DB
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                aiProvider: true,
+                aiApiKey: true,
+                aiModel: true,
+                aiApiUrl: true
+            }
+        });
+
+
         // Run the code analyzer
-        const reviewResult = performAIReview(snippet.title, snippet.language, snippet.code);
+        const reviewResult = await performAIReview(snippet.title, snippet.language, snippet.code, user);
         // Store the result in database
         const codeReview = await prisma.codeReview.create({
             data: {
