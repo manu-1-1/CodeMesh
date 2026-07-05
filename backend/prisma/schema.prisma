@@ -26,6 +26,10 @@ model User {
   snippets     Snippet[]
   githubConnection GitHubConnection? 
   invitationsSent  Invitation[]      @relation("Inviter")
+  aiProvider   String?           @default("mock")
+  aiApiKey     String?
+  aiModel      String?
+  aiApiUrl     String?
 
   @@map("users")
 }
