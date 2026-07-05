@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
 import './SettingsArea.css';
 
@@ -30,7 +30,7 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
     const [workspaceSuccess, setWorkspaceSuccess] = useState('');
 
     // AI Settings State
-    const [aiProvider, setAiProvider] = useState('mock');
+    const [aiProvider, setAiProvider] = useState('ollama');
     const [aiApiKey, setAiApiKey] = useState('');
     const [aiModel, setAiModel] = useState('');
     const [aiApiUrl, setAiApiUrl] = useState('');
@@ -447,7 +447,6 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
                                             }
                                         }}
                                     >
-                                        <option value="mock">Offline / Local Scanner (Mock)</option>
                                         <option value="ollama">Ollama (Local Offline LLM)</option>
                                         <option value="openai">OpenAI (ChatGPT)</option>
                                         <option value="anthropic">Anthropic (Claude)</option>
@@ -455,8 +454,7 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
                                     </select>
                                 </div>
 
-                                {aiProvider !== 'mock' && (
-                                    <>
+
                                         {aiProvider === 'ollama' && (
                                             <div className="form-group">
                                                 <label htmlFor="ai-api-url" className="form-label">Ollama Base URL</label>
@@ -499,8 +497,6 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
                                                 />
                                             </div>
                                         )}
-                                    </>
-                                )}
 
                                 <button type="submit" className="btn-primary" disabled={loadingAi}>
                                     {loadingAi ? 'Saving...' : 'Save AI Settings'}
