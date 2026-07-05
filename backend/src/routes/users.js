@@ -5,21 +5,32 @@ import { hashPassword, comparePassword } from '../utils/auth.js';
 const router = express.Router();
 router.use(authenticateToken);
 
-// 1. Update Profile (name and/or avatarUrl)
+// 1. Update Profile (name, avatarUrl, and AI configuration settings)
 router.put('/profile', async (req, res) => {
-    const { name, avatarUrl } = req.body;
+    const { name, avatarUrl, aiProvider, aiApiKey, aiModel, aiApiUrl } = req.body;
     const userId = req.user.id;
-    if (name === undefined && avatarUrl === undefined) {
-        return res.status(400).json({ error: 'At least one field (name or avatarUrl) is required to update' });
-    }
     try {
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: {
                 name: name !== undefined ? name : undefined,
                 avatarUrl: avatarUrl !== undefined ? avatarUrl : undefined,
+                aiProvider: aiProvider !== undefined ? aiProvider : undefined,
+                // If the key is the masked placeholder "••••••••••••••••", don't change it in the database
+                aiApiKey: (aiApiKey !== undefined && aiApiKey !== "••••••••••••••••") ? aiApiKey : undefined,
+                aiModel: aiModel !== undefined ? aiModel : undefined,
+                aiApiUrl: aiApiUrl !== undefined ? aiApiUrl : undefined,
             },
-            select: { id: true, name: true, email: true, avatarUrl: true, createdAt: true },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                avatarUrl: true,
+                createdAt: true,
+                aiProvider: true,
+                aiModel: true,
+                aiApiUrl: true
+            },
         });
         res.json({
             message: 'Profile updated successfully',
