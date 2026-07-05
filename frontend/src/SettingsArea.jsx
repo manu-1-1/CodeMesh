@@ -29,6 +29,14 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
     const [loadingWorkspace, setLoadingWorkspace] = useState(false);
     const [workspaceSuccess, setWorkspaceSuccess] = useState('');
 
+    // AI Settings State
+    const [aiProvider, setAiProvider] = useState('mock');
+    const [aiApiKey, setAiApiKey] = useState('');
+    const [aiModel, setAiModel] = useState('');
+    const [aiApiUrl, setAiApiUrl] = useState('');
+    const [loadingAi, setLoadingAi] = useState(false);
+    const [aiSuccess, setAiSuccess] = useState('');
+
     const handleUpdateWorkspace = async (e) => {
         e.preventDefault();
         if (!workspaceName.trim()) return;
@@ -208,6 +216,24 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
     // Find active user's role in workspace
     const memberRecord = members.find(m => m.user.id === currentUser.id);
     const userRole = memberRecord ? memberRecord.role : 'MEMBER';
+
+    // Fetch AI configuration on-demand
+    useEffect(() => {
+        const fetchAiSettings = async () => {
+            try {
+                const data = await apiRequest('/users/ai-settings');
+                if (data) {
+                    setAiProvider(data.aiProvider || 'mock');
+                    setAiModel(data.aiModel || '');
+                    setAiApiUrl(data.aiApiUrl || '');
+                    setAiApiKey(data.aiApiKey || '');
+                }
+            } catch (err) {
+                console.error("Failed to load user AI settings: ", err.message);
+            }
+        };
+        fetchAiSettings();
+    }, []);
 
     return (
         <div className="chat-screen-layout">
