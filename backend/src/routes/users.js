@@ -70,4 +70,32 @@ router.put('/password', async (req, res) => {
     }
 });
 
+// 3. Get User's AI Configuration Settings (Only fetched when opening Settings panel)
+router.get('/ai-settings', async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                aiProvider: true,
+                aiModel: true,
+                aiApiUrl: true,
+                aiApiKey: true
+            }
+        });
+
+        if (user) {
+            // Mask the API key so the raw secret is never sent to the browser
+            if (user.aiApiKey) {
+                user.aiApiKey = "••••••••••••••••";
+            }
+            res.json(user);
+        } else {
+            res.json({ aiProvider: 'mock', aiModel: '', aiApiUrl: '', aiApiKey: '' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;
