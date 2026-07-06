@@ -5,23 +5,39 @@ import { authenticateToken } from '../middleware/auth.js';
 const router = express.Router();
 router.use(authenticateToken);
 
-// 1. Connect GitHub Account (POST /api/v1/github/connect)
+// Helper to check workspace membership
+async function checkWorkspaceMember(workspaceId, userId) {
+    return await prisma.workspaceMember.findUnique({
+        where: { workspaceId_userId: { workspaceId, userId } }
+    });
+}
+
+// 1. Connect GitHub Account to Workspace (POST /api/v1/github/connect)
 router.post('/connect', async (req, res) => {
-    const { githubUsername, accessToken } = req.body;
+    const { workspaceId, githubUsername, accessToken } = req.body;
     const userId = req.user.id;
-    if (!githubUsername || !accessToken) {
-        return res.status(400).json({ error: 'githubUsername and accessToken are required' });
+
+    if (!workspaceId || !githubUsername || !accessToken) {
+        return res.status(400).json({ error: 'workspaceId, githubUsername, and accessToken are required' });
     }
+
     try {
+        const member = await checkWorkspaceMember(workspaceId, userId);
+        if (!member) {
+            return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
+        }
+
         const connection = await prisma.gitHubConnection.upsert({
-            where: { userId },
+            where: { workspaceId },
             update: { githubUsername, accessToken },
-            create: { userId, githubUsername, accessToken }
+            create: { workspaceId, githubUsername, accessToken }
         });
+
         res.status(200).json({
-            message: 'GitHub account connected successfully',
+            message: 'GitHub account connected to workspace successfully',
             connection: {
                 id: connection.id,
+                workspaceId: connection.workspaceId,
                 githubUsername: connection.githubUsername,
                 createdAt: connection.createdAt
             }
@@ -31,49 +47,63 @@ router.post('/connect', async (req, res) => {
     }
 });
 
-// 2. Disconnect GitHub Account (DELETE /api/v1/github/disconnect)
+// 2. Disconnect GitHub Account from Workspace (DELETE /api/v1/github/disconnect)
 router.delete('/disconnect', async (req, res) => {
+    const { workspaceId } = req.body; // or req.query
     const userId = req.user.id;
+
+    if (!workspaceId) {
+        return res.status(400).json({ error: 'workspaceId is required' });
+    }
+
     try {
+        const member = await checkWorkspaceMember(workspaceId, userId);
+        if (!member) {
+            return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
+        }
+
         const existing = await prisma.gitHubConnection.findUnique({
-            where: { userId }
+            where: { workspaceId }
         });
         if (!existing) {
-            return res.status(404).json({ error: 'No connected GitHub account found' });
+            return res.status(404).json({ error: 'No connected GitHub account found for this workspace' });
         }
+
         await prisma.gitHubConnection.delete({
-            where: { userId }
+            where: { workspaceId }
         });
-        res.json({ message: 'GitHub account disconnected successfully' });
+
+        res.json({ message: 'GitHub account disconnected from workspace successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-
 // 3. Sync Workspace Repositories & PRs (POST /api/v1/github/sync)
 router.post('/sync', async (req, res) => {
     const { workspaceId } = req.body;
     const userId = req.user.id;
+
     if (!workspaceId) {
         return res.status(400).json({ error: 'workspaceId is required' });
     }
+
     try {
-        // A. Verify caller workspace membership
-        const member = await prisma.workspaceMember.findUnique({
-            where: { workspaceId_userId: { workspaceId, userId } }
-        });
+        const member = await checkWorkspaceMember(workspaceId, userId);
         if (!member) {
             return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
         }
-        // B. Verify caller has connected GitHub connection
+
+        // Retrieve the connection associated with this workspace
         const connection = await prisma.gitHubConnection.findUnique({
-            where: { userId }
+            where: { workspaceId }
         });
+
         if (!connection) {
-            return res.status(400).json({ error: 'Access denied: Please connect your GitHub account first' });
+            return res.status(400).json({ error: 'Access denied: Please connect a GitHub account to this workspace first' });
         }
-        // C. Fetch real repositories from GitHub API
+
+        // Fetch real repositories from GitHub API
         const reposResponse = await fetch('https://api.github.com/user/repos?per_page=100', {
             headers: {
                 'Authorization': `Bearer ${connection.accessToken}`,
@@ -81,12 +111,15 @@ router.post('/sync', async (req, res) => {
                 'User-Agent': 'CodeMesh-Backend'
             }
         });
+
         if (!reposResponse.ok) {
             const errorText = await reposResponse.text();
             return res.status(reposResponse.status).json({ error: `GitHub API error: ${errorText}` });
         }
+
         const githubRepos = await reposResponse.json();
-        // D. Perform repository & PR sync logic using transactions
+
+        // Perform repository & PR sync logic using transactions
         const syncedData = await prisma.$transaction(async (tx) => {
             const result = [];
             for (const repoInfo of githubRepos) {
@@ -103,6 +136,7 @@ router.post('/sync', async (req, res) => {
                         githubId: repoInfo.id
                     }
                 });
+
                 // Fetch real Pull Requests for this repository
                 const prsResponse = await fetch(`https://api.github.com/repos/${repoInfo.full_name}/pulls?state=all&per_page=100`, {
                     headers: {
@@ -111,10 +145,12 @@ router.post('/sync', async (req, res) => {
                         'User-Agent': 'CodeMesh-Backend'
                     }
                 });
+
                 let githubPRs = [];
                 if (prsResponse.ok) {
                     githubPRs = await prsResponse.json();
                 }
+
                 const prs = [];
                 for (const prInfo of githubPRs) {
                     const pr = await tx.pullRequest.upsert({
@@ -140,6 +176,11 @@ router.post('/sync', async (req, res) => {
             }
             return result;
         });
+
+        res.json({
+            message: 'Repositories and Pull Requests synchronized successfully',
+            repositories: syncedData
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -149,16 +190,17 @@ router.post('/sync', async (req, res) => {
 router.get('/repositories', async (req, res) => {
     const { workspaceId } = req.query;
     const userId = req.user.id;
+
     if (!workspaceId) {
         return res.status(400).json({ error: 'workspaceId query param is required' });
     }
+
     try {
-        const member = await prisma.workspaceMember.findUnique({
-            where: { workspaceId_userId: { workspaceId, userId } }
-        });
+        const member = await checkWorkspaceMember(workspaceId, userId);
         if (!member) {
             return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
         }
+
         const repositories = await prisma.repository.findMany({
             where: { workspaceId },
             include: { pullRequests: true }
@@ -169,18 +211,30 @@ router.get('/repositories', async (req, res) => {
     }
 });
 
-// 5. Check GitHub Connection Status (GET /api/v1/github/status)
+// 5. Check GitHub Connection Status for Workspace (GET /api/v1/github/status)
 router.get('/status', async (req, res) => {
+    const { workspaceId } = req.query;
     const userId = req.user.id;
+
+    if (!workspaceId) {
+        return res.status(400).json({ error: 'workspaceId query param is required' });
+    }
+
     try {
+        const member = await checkWorkspaceMember(workspaceId, userId);
+        if (!member) {
+            return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
+        }
+
         const connection = await prisma.gitHubConnection.findUnique({
-            where: { userId },
+            where: { workspaceId },
             select: {
                 id: true,
                 githubUsername: true,
                 createdAt: true
             }
         });
+
         res.json({
             connected: !!connection,
             connection
@@ -189,6 +243,5 @@ router.get('/status', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 export default router;
