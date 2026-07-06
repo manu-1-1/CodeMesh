@@ -73,45 +73,65 @@ router.post('/sync', async (req, res) => {
         if (!connection) {
             return res.status(400).json({ error: 'Access denied: Please connect your GitHub account first' });
         }
-        // C. Perform mock repository & PR sync logic using transactions
-        const mockRepos = [
-            { name: 'api-service', fullName: `${connection.githubUsername}/api-service`, githubId: 10101 },
-            { name: 'frontend-app', fullName: `${connection.githubUsername}/frontend-app`, githubId: 10102 }
-        ];
+        // C. Fetch real repositories from GitHub API
+        const reposResponse = await fetch('https://api.github.com/user/repos?per_page=100', {
+            headers: {
+                'Authorization': `Bearer ${connection.accessToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'CodeMesh-Backend'
+            }
+        });
+        if (!reposResponse.ok) {
+            const errorText = await reposResponse.text();
+            return res.status(reposResponse.status).json({ error: `GitHub API error: ${errorText}` });
+        }
+        const githubRepos = await reposResponse.json();
+        // D. Perform repository & PR sync logic using transactions
         const syncedData = await prisma.$transaction(async (tx) => {
             const result = [];
-            for (const repoInfo of mockRepos) {
+            for (const repoInfo of githubRepos) {
                 // Upsert repository
                 const repo = await tx.repository.upsert({
                     where: {
-                        workspaceId_fullName: { workspaceId, fullName: repoInfo.fullName }
+                        workspaceId_fullName: { workspaceId, fullName: repoInfo.full_name }
                     },
-                    update: { name: repoInfo.name, githubId: repoInfo.githubId },
+                    update: { name: repoInfo.name, githubId: repoInfo.id },
                     create: {
                         workspaceId,
                         name: repoInfo.name,
-                        fullName: repoInfo.fullName,
-                        githubId: repoInfo.githubId
+                        fullName: repoInfo.full_name,
+                        githubId: repoInfo.id
                     }
                 });
-                // Sync mock PRs
-                const mockPRs = [
-                    { number: 1, title: 'Fix auth token expiry logic', state: 'OPEN', htmlUrl: `https://github.com/${repo.fullName}/pull/1` },
-                    { number: 2, title: 'Add Redis caching support', state: 'CLOSED', htmlUrl: `https://github.com/${repo.fullName}/pull/2` }
-                ];
+                // Fetch real Pull Requests for this repository
+                const prsResponse = await fetch(`https://api.github.com/repos/${repoInfo.full_name}/pulls?state=all&per_page=100`, {
+                    headers: {
+                        'Authorization': `Bearer ${connection.accessToken}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'User-Agent': 'CodeMesh-Backend'
+                    }
+                });
+                let githubPRs = [];
+                if (prsResponse.ok) {
+                    githubPRs = await prsResponse.json();
+                }
                 const prs = [];
-                for (const prInfo of mockPRs) {
+                for (const prInfo of githubPRs) {
                     const pr = await tx.pullRequest.upsert({
                         where: {
                             repositoryId_number: { repositoryId: repo.id, number: prInfo.number }
                         },
-                        update: { title: prInfo.title, state: prInfo.state, htmlUrl: prInfo.htmlUrl },
+                        update: {
+                            title: prInfo.title,
+                            state: prInfo.state.toUpperCase(),
+                            htmlUrl: prInfo.html_url
+                        },
                         create: {
                             repositoryId: repo.id,
                             number: prInfo.number,
                             title: prInfo.title,
-                            state: prInfo.state,
-                            htmlUrl: prInfo.htmlUrl
+                            state: prInfo.state.toUpperCase(),
+                            htmlUrl: prInfo.html_url
                         }
                     });
                     prs.push(pr);
@@ -119,10 +139,6 @@ router.post('/sync', async (req, res) => {
                 result.push({ ...repo, pullRequests: prs });
             }
             return result;
-        });
-        res.json({
-            message: 'Repositories and Pull Requests synchronized successfully',
-            repositories: syncedData
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
