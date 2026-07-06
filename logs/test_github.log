@@ -1,29 +1,32 @@
-﻿=== Testing GitHub Integration ===
+=== Test Log started at 2026-07-06T06:47:32.728Z ===
+
+=== Testing GitHub Integration ===
 1. User registered successfully.
 2. Workspace created successfully.
 
 3. Testing sync before connecting GitHub account...
 Status: 400
 Response: {
-  error: 'Access denied: Please connect a GitHub account to this workspace first'
+  "error": "Access denied: Please connect a GitHub account to this workspace first"
 }
-Γ£à Successfully blocked sync for disconnected accounts.
+✅ Successfully blocked sync for disconnected accounts.
 
 4. Connecting GitHub account...
 Status: 200
 Response: {
-  message: 'GitHub account connected to workspace successfully',
-  connection: {
-    id: '9c1d4908-15f0-494d-9181-1d194d2cb6f8',
-    workspaceId: 'e165dc88-02ab-4c76-8e22-5c453e81722f',
-    githubUsername: 'octocat',
-    createdAt: '2026-07-06T06:38:55.271Z'
+  "message": "GitHub account connected to workspace successfully",
+  "connection": {
+    "id": "2d5fa284-3f78-4d78-ae9f-bb487d5c91c1",
+    "workspaceId": "ade69397-8f28-4509-a99c-c735c685f199",
+    "githubUsername": "octocat",
+    "createdAt": "2026-07-06T06:47:32.906Z"
   }
 }
-Γ£à GitHub account connected successfully.
+✅ GitHub account connected successfully.
 
 5. Syncing repositories and PRs...
 Status: 401
 Response: {
   "error": "GitHub API error: {\r\n  \"message\": \"Bad credentials\",\r\n  \"documentation_url\": \"https://docs.github.com/rest\",\r\n  \"status\": \"401\"\r\n}"
 }
+[ERROR] ❌ Test failed: Sync failed

@@ -170,14 +170,36 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
                     <div className="sidebar-section-title">
                         <span>GitHub Repos</span>
                         {isConnected && (
-                            <button
-                                className="btn-sync-refresh"
-                                onClick={handleSync}
-                                title="Sync Repositories"
-                                disabled={syncing}
-                            >
-                                {syncing ? '⌛' : '🔄'}
-                            </button>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <span style={{ fontSize: '11px', opacity: 0.6 }} title={`Connected as ${githubUsername}`}>
+                                    ({githubUsername})
+                                </span>
+                                <button
+                                    className="btn-sync-refresh"
+                                    onClick={handleSync}
+                                    title="Sync Repositories"
+                                    disabled={syncing}
+                                    style={{ margin: 0 }}
+                                >
+                                    {syncing ? '⌛' : '🔄'}
+                                </button>
+                                <button
+                                    onClick={handleDisconnect}
+                                    title="Disconnect GitHub"
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        fontSize: '12px',
+                                        padding: '2px 4px',
+                                        color: '#ff4d4f',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    ❌
+                                </button>
+                            </div>
                         )}
                     </div>
 

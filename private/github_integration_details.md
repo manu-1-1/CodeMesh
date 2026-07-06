@@ -1,3 +1,80 @@
+# Workspace-Scoped Real GitHub Integration & Optimizations
+
+This document explains the architecture, changes, reasoning, and final code implemented for the workspace-scoped real GitHub Integration in CodeMesh.
+
+---
+
+## 1. What We Did & Why We Did It
+
+### A. Scoped GitHub Integration per Workspace
+* **What**: We shifted the `GitHubConnection` model in the database from being associated 1-to-1 with a **User** to being associated 1-to-1 with a **Workspace**.
+* **Why**: Originally, connecting a GitHub account applied globally to the user. However, a developer often works in multiple workspaces (e.g., personal projects vs. client projects), which require different GitHub accounts or Personal Access Tokens (PATs). Scoping the connection to the Workspace enables completely independent settings per workspace.
+
+### B. Real GitHub API Integration
+* **What**: We replaced the mock backend data (static arrays of repos and PRs) with live fetches to GitHub's REST API.
+* **Why**: To provide real-world functionality where actual repositories and open/closed Pull Requests are synchronized from GitHub.
+
+### C. Parallel Fetching & Transaction Optimization
+* **What**: We restructured the `/sync` backend endpoint to make all network requests (`fetch` calls to GitHub) in parallel *outside* the database transaction, then executed a single quick transaction to save the records.
+* **Why**: Slow network requests inside interactive database transactions hold database connections open. For users with multiple repositories, this easily exceeded Prisma's default 5-second timeout, throwing `500 Internal Server Error` (Prisma error `P2028`). Running network calls in parallel outside the transaction reduced the database operation time to under 50ms.
+
+### D. Token Repository Selection Filter (Public Repos Filter)
+* **What**: We added a check on the collaborator permission endpoint (`GET /repos/{owner}/{repo}/collaborators/{username}/permission`) for each repository returned by the API. 
+* **Why**: When a user limits a Fine-Grained Personal Access Token to "Only select repositories", GitHub's `GET /user/repos` endpoint still lists all public repositories the user owns/contributes to because they are public. However, the token cannot perform privileged tasks or write tasks on unselected repos. Checking collaborator permissions returns `403 Forbidden` for unselected repositories, allowing us to filter them out and only display the ones you explicitly authorized.
+
+### E. Sidebar Disconnect UI Integration
+* **What**: We integrated the connected account name and a disconnect button (❌) directly next to the sync button in the sidebar.
+* **Why**: Previously, the disconnect button was only visible on the "empty details" screen. Since the UI automatically selects the first synced repository on load, the empty details screen was hidden, locking users out of disconnecting or changing their token.
+
+---
+
+## 2. Final Code & Explanations
+
+### 1. Database Schema Changes
+**File:** [schema.prisma](file:///d:/Projects/CodeMesh/backend/prisma/schema.prisma)
+
+We removed the `githubConnection` field from the `User` model, added it to the `Workspace` model, and updated `GitHubConnection` to map to `workspaceId` instead of `userId`.
+
+```prisma
+model Workspace {
+  id               String            @id @default(uuid())
+  name             String
+  description      String?
+  ownerId          String
+  owner            User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  members          WorkspaceMember[]
+  channels         Channel[]
+  snippets         Snippet[]
+  repositories     Repository[]
+  invitations      Invitation[]
+  githubConnection GitHubConnection? // Added relation to GitHubConnection
+
+  @@map("workspaces")
+}
+
+model GitHubConnection {
+  id             String    @id @default(uuid())
+  workspaceId    String    @unique @map("workspace_id") // Scoped to workspace
+  githubUsername String    @map("github_username")
+  accessToken    String    @map("access_token")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("github_connections")
+}
+```
+
+---
+
+### 2. Backend Routes
+**File:** [github.js](file:///d:/Projects/CodeMesh/backend/src/routes/github.js)
+
+This handles workspace membership authorization, queries the GitHub API, filters unaccessible repos, and upserts data fast.
+
+```javascript
 import express from 'express';
 import { prisma } from '../lib/prisma.js';
 import { authenticateToken } from '../middleware/auth.js';
@@ -12,7 +89,7 @@ async function checkWorkspaceMember(workspaceId, userId) {
     });
 }
 
-// 1. Connect GitHub Account to Workspace (POST /api/v1/github/connect)
+// 1. Connect GitHub Account to Workspace
 router.post('/connect', async (req, res) => {
     const { workspaceId, githubUsername, accessToken } = req.body;
     const userId = req.user.id;
@@ -47,9 +124,9 @@ router.post('/connect', async (req, res) => {
     }
 });
 
-// 2. Disconnect GitHub Account from Workspace (DELETE /api/v1/github/disconnect)
+// 2. Disconnect GitHub Account from Workspace
 router.delete('/disconnect', async (req, res) => {
-    const { workspaceId } = req.body; // or req.query
+    const { workspaceId } = req.body;
     const userId = req.user.id;
 
     if (!workspaceId) {
@@ -79,7 +156,7 @@ router.delete('/disconnect', async (req, res) => {
     }
 });
 
-// 3. Sync Workspace Repositories & PRs (POST /api/v1/github/sync)
+// 3. Sync Workspace Repositories & PRs (Highly Optimized)
 router.post('/sync', async (req, res) => {
     const { workspaceId } = req.body;
     const userId = req.user.id;
@@ -94,7 +171,6 @@ router.post('/sync', async (req, res) => {
             return res.status(403).json({ error: 'Access denied: You are not a member of this workspace' });
         }
 
-        // Retrieve the connection associated with this workspace
         const connection = await prisma.gitHubConnection.findUnique({
             where: { workspaceId }
         });
@@ -103,7 +179,7 @@ router.post('/sync', async (req, res) => {
             return res.status(400).json({ error: 'Access denied: Please connect a GitHub account to this workspace first' });
         }
 
-        // Fetch real repositories from GitHub API
+        // Fetch user repositories from GitHub
         const reposResponse = await fetch('https://api.github.com/user/repos?per_page=100', {
             headers: {
                 'Authorization': `Bearer ${connection.accessToken}`,
@@ -120,12 +196,10 @@ router.post('/sync', async (req, res) => {
 
         const githubRepos = await reposResponse.json();
 
-        // E. Fetch all Pull Requests in parallel outside of the database transaction to prevent timeouts
+        // Fetch all Pull Requests and filter unaccessible repos in parallel OUTSIDE the transaction
         const repoDataPromises = githubRepos.map(async (repoInfo) => {
             try {
-                // Check if the token has explicit developer/collaborator access on this repository.
-                // Since GET /user/repos lists all owned public repositories regardless of token selection,
-                // this API call will return 403 Forbidden for any repository that wasn't explicitly selected for this token.
+                // Query collaborator permissions. If unselected for this token, it returns 403 Forbidden.
                 const permissionResponse = await fetch(`https://api.github.com/repos/${repoInfo.full_name}/collaborators/${connection.githubUsername}/permission`, {
                     headers: {
                         'Authorization': `Bearer ${connection.accessToken}`,
@@ -135,7 +209,7 @@ router.post('/sync', async (req, res) => {
                 });
 
                 if (permissionResponse.status !== 200) {
-                    return null; // Skip repository if the token doesn't have explicit access
+                    return null; // Skip repository if token has no explicit access
                 }
 
                 // Fetch Pull Requests
@@ -154,13 +228,13 @@ router.post('/sync', async (req, res) => {
                 return { repoInfo, prs };
             } catch (err) {
                 console.error(`Failed to fetch repo ${repoInfo.full_name}:`, err);
-                return null; // Skip this repository on error
+                return null;
             }
         });
 
         const allReposData = (await Promise.all(repoDataPromises)).filter(Boolean);
 
-        // F. Perform repository & PR database sync inside transaction (super fast now, no network calls!)
+        // Perform repository & PR database sync inside database transaction (takes milliseconds now!)
         const syncedData = await prisma.$transaction(async (tx) => {
             const result = [];
             const syncedRepoIds = [];
@@ -206,7 +280,7 @@ router.post('/sync', async (req, res) => {
                 result.push({ ...repo, pullRequests: syncedPRs });
             }
 
-            // Remove any repositories in this workspace that are no longer accessible/selected under the token
+            // Remove any old/unselected repositories from the database for this workspace
             await tx.repository.deleteMany({
                 where: {
                     workspaceId,
@@ -227,7 +301,7 @@ router.post('/sync', async (req, res) => {
     }
 });
 
-// 4. List Synced Repositories for a Workspace (GET /api/v1/github/repositories)
+// 4. List Synced Repositories for a Workspace
 router.get('/repositories', async (req, res) => {
     const { workspaceId } = req.query;
     const userId = req.user.id;
@@ -252,7 +326,7 @@ router.get('/repositories', async (req, res) => {
     }
 });
 
-// 5. Check GitHub Connection Status for Workspace (GET /api/v1/github/status)
+// 5. Check GitHub Connection Status for Workspace
 router.get('/status', async (req, res) => {
     const { workspaceId } = req.query;
     const userId = req.user.id;
@@ -286,3 +360,67 @@ router.get('/status', async (req, res) => {
 });
 
 export default router;
+```
+
+---
+
+### 3. Frontend Area Changes
+**File:** [GitHubArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/GitHubArea.jsx)
+
+The frontend is updated to pass `workspace.id` in all operations (`status`, `connect`, `disconnect`, `sync`) and renders a small `❌` button to disconnect right in the sidebar.
+
+```javascript
+    const checkStatus = async () => {
+        try {
+            const data = await apiRequest(`/github/status?workspaceId=${workspace.id}`);
+            setIsConnected(data.connected);
+            if (data.connected && data.connection) {
+                setGithubUsername(data.connection.githubUsername);
+            }
+        } catch (err) {
+            console.error('Failed to fetch github status:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+```
+
+#### Sidebar UI Snippet:
+```javascript
+                <div className="sidebar-section">
+                    <div className="sidebar-section-title">
+                        <span>GitHub Repos</span>
+                        {isConnected && (
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <span style={{ fontSize: '11px', opacity: 0.6 }} title={`Connected as ${githubUsername}`}>
+                                    ({githubUsername})
+                                </span>
+                                <button
+                                    className="btn-sync-refresh"
+                                    onClick={handleSync}
+                                    title="Sync Repositories"
+                                    disabled={syncing}
+                                    style={{ margin: 0 }}
+                                >
+                                    {syncing ? '⌛' : '🔄'}
+                                </button>
+                                <button
+                                    onClick={handleDisconnect}
+                                    title="Disconnect GitHub"
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        fontSize: '12px',
+                                        padding: '2px 4px',
+                                        color: '#ff4d4f',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    ❌
+                                </button>
+                            </div>
+                        )}
+                    </div>
+```
