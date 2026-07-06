@@ -1,3 +1,31 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const logDir = path.join(__dirname, '..', 'logs');
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+}
+const logFile = path.join(logDir, 'test_github.log');
+
+// Reset the log file
+fs.writeFileSync(logFile, `=== Test Log started at ${new Date().toISOString()} ===\n\n`);
+
+const originalLog = console.log;
+const originalError = console.error;
+
+console.log = (...args) => {
+    originalLog(...args);
+    fs.appendFileSync(logFile, args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ') + '\n');
+};
+
+console.error = (...args) => {
+    originalError(...args);
+    fs.appendFileSync(logFile, '[ERROR] ' + args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ') + '\n');
+};
+
 const PORT = process.env.PORT || 5000;
 const BASE_AUTH_URL = `http://localhost:${PORT}/api/v1/auth`;
 const BASE_WORKSPACE_URL = `http://localhost:${PORT}/api/v1/workspaces`;
