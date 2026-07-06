@@ -24,7 +24,6 @@ model User {
   memberships  WorkspaceMember[]
   messages     Message[]
   snippets     Snippet[]
-  githubConnection GitHubConnection? 
   invitationsSent  Invitation[]      @relation("Inviter")
   aiProvider   String?           @default("mock")
   aiApiKey     String?
@@ -47,6 +46,7 @@ model Workspace {
   snippets    Snippet[]
   repositories Repository[]
   invitations  Invitation[]
+  githubConnection GitHubConnection?
 
   @@map("workspaces")
 }
