@@ -28,10 +28,14 @@ async function getJSON(url, token = null) {
     return { status: response.status, data: await response.json() };
 }
 
-async function deleteJSON(url, token = null) {
-    const headers = {};
+async function deleteJSON(url, body, token = null) {
+    const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const response = await fetch(url, { method: 'DELETE', headers });
+    const response = await fetch(url, {
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify(body)
+    });
     return { status: response.status, data: await response.json() };
 }
 
@@ -59,6 +63,7 @@ async function runTests() {
         // 4. Connect GitHub Account
         console.log("\n4. Connecting GitHub account...");
         const connectRes = await postJSON(`${BASE_GITHUB_URL}/connect`, {
+            workspaceId,
             githubUsername: "octocat",
             accessToken: "ghp_mock_token_123456"
         }, token);
@@ -85,7 +90,7 @@ async function runTests() {
 
         // 7. Disconnect GitHub Account
         console.log("\n7. Disconnecting GitHub account...");
-        const disconnectRes = await deleteJSON(`${BASE_GITHUB_URL}/disconnect`, token);
+        const disconnectRes = await deleteJSON(`${BASE_GITHUB_URL}/disconnect`, { workspaceId }, token);
         console.log(`Status: ${disconnectRes.status}`);
         if (disconnectRes.status !== 200) throw new Error("Disconnect failed");
         console.log("✅ GitHub account disconnected successfully.");
