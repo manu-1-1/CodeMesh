@@ -11,9 +11,10 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
     const [error, setError] = useState('');
     const [usernameInput, setUsernameInput] = useState('');
     const [tokenInput, setTokenInput] = useState('');
+
     const checkStatus = async () => {
         try {
-            const data = await apiRequest('/github/status');
+            const data = await apiRequest(`/github/status?workspaceId=${workspace.id}`);
             setIsConnected(data.connected);
             if (data.connected && data.connection) {
                 setGithubUsername(data.connection.githubUsername);
@@ -24,6 +25,7 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
             setLoading(false);
         }
     };
+
     const fetchRepos = async () => {
         try {
             const data = await apiRequest(`/github/repositories?workspaceId=${workspace.id}`);
@@ -50,6 +52,7 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
             await apiRequest('/github/connect', {
                 method: 'POST',
                 body: JSON.stringify({
+                    workspaceId: workspace.id,
                     githubUsername: usernameInput.trim(),
                     accessToken: tokenInput.trim()
                 })
@@ -74,7 +77,10 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
         setError('');
 
         try {
-            await apiRequest('/github/disconnect', { method: 'DELETE' });
+            await apiRequest('/github/disconnect', {
+                method: 'DELETE',
+                body: JSON.stringify({ workspaceId: workspace.id })
+            });
             setIsConnected(false);
             setGithubUsername('');
             setRepos([]);
