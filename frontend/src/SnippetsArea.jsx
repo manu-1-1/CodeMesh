@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
 import './SnippetsArea.css';
-export default function SnippetsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab }) {
+export default function SnippetsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, sidebarWidth, startResize }) {
     const [snippets, setSnippets] = useState([]);
     const [selectedSnippet, setSelectedSnippet] = useState(null);
     const [snippetDetails, setSnippetDetails] = useState(null);
@@ -144,7 +144,7 @@ export default function SnippetsArea({ workspace, currentUser, onBackToWorkspace
     return (
         <div className="chat-screen-layout">
             {/* Sidebar */}
-            <aside className="sidebar">
+            <aside className="sidebar" style={{ width: `${sidebarWidth}px` }}>
                 <header className="sidebar-header">
                     <h3>{workspace.name}</h3>
                     <button className="btn-back" onClick={onBackToWorkspaces} title="Back to workspaces">
@@ -223,6 +223,7 @@ export default function SnippetsArea({ workspace, currentUser, onBackToWorkspace
                     </div>
                 </footer>
             </aside>
+            <div className="sidebar-resizer" onMouseDown={startResize} />
 
             {/* Main Panel split into Code Viewer and AI Code Reviews */}
             <main className="snippets-main">

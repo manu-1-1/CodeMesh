@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
 import './SettingsArea.css';
 
-export default function SettingsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, onUserUpdate, onMembersUpdate, onWorkspaceUpdate }) {
+export default function SettingsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, onUserUpdate, onMembersUpdate, onWorkspaceUpdate, sidebarWidth, startResize }) {
     const [name, setName] = useState(currentUser.name || '');
     const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || '');
 
@@ -265,7 +265,7 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
     return (
         <div className="chat-screen-layout">
             {/* Sidebar */}
-            <aside className="sidebar">
+            <aside className="sidebar" style={{ width: `${sidebarWidth}px` }}>
                 <header className="sidebar-header">
                     <h3>{workspace.name}</h3>
                     <button className="btn-back" onClick={onBackToWorkspaces} title="Back to workspaces">
@@ -323,6 +323,7 @@ export default function SettingsArea({ workspace, currentUser, onBackToWorkspace
                     </div>
                 </footer>
             </aside>
+            <div className="sidebar-resizer" onMouseDown={startResize} />
 
             {/* Main Panel */}
             <main className="settings-main">

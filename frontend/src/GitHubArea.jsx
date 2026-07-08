@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
 import './GitHubArea.css';
-export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab }) {
+export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, sidebarWidth, startResize }) {
     const [isConnected, setIsConnected] = useState(false);
     const [githubUsername, setGithubUsername] = useState('');
     const [repos, setRepos] = useState([]);
@@ -131,7 +131,7 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
     return (
         <div className="chat-screen-layout">
             {/* Sidebar */}
-            <aside className="sidebar">
+            <aside className="sidebar" style={{ width: `${sidebarWidth}px` }}>
                 <header className="sidebar-header">
                     <h3>{workspace.name}</h3>
                     <button className="btn-back" onClick={onBackToWorkspaces} title="Back to workspaces">
@@ -235,6 +235,7 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
                     </div>
                 </footer>
             </aside>
+            <div className="sidebar-resizer" onMouseDown={startResize} />
 
             {/* Main Panel */}
             <main className="github-main">

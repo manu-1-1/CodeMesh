@@ -20,6 +20,33 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
     const [editingMessageId, setEditingMessageId] = useState(null);
     const [editInput, setEditInput] = useState('');
 
+    const [sidebarWidth, setSidebarWidth] = useState(() => {
+        const saved = localStorage.getItem('sidebarWidth');
+        return saved ? parseInt(saved, 10) : 280;
+    });
+
+    const startResize = (e) => {
+        e.preventDefault();
+        const startX = e.clientX;
+        const startWidth = sidebarWidth;
+
+        const doDrag = (moveEvent) => {
+            const currentWidth = startWidth + (moveEvent.clientX - startX);
+            if (currentWidth >= 200 && currentWidth <= 480) {
+                setSidebarWidth(currentWidth);
+                localStorage.setItem('sidebarWidth', currentWidth.toString());
+            }
+        };
+
+        const stopDrag = () => {
+            document.removeEventListener('mousemove', doDrag);
+            document.removeEventListener('mouseup', stopDrag);
+        };
+
+        document.addEventListener('mousemove', doDrag);
+        document.addEventListener('mouseup', stopDrag);
+    };
+
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
 
@@ -184,6 +211,8 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                 members={members}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                sidebarWidth={sidebarWidth}
+                startResize={startResize}
             />
         );
     }
@@ -197,6 +226,8 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                 members={members}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                sidebarWidth={sidebarWidth}
+                startResize={startResize}
             />
         );
     }
@@ -213,6 +244,8 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                 onUserUpdate={onUserUpdate}
                 onMembersUpdate={fetchMembers}
                 onWorkspaceUpdate={onWorkspaceUpdate}
+                sidebarWidth={sidebarWidth}
+                startResize={startResize}
             />
         );
     }
@@ -222,7 +255,7 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
     return (
         <div className="chat-screen-layout">
             {/* Sidebar */}
-            <aside className="sidebar">
+            <aside className="sidebar" style={{ width: `${sidebarWidth}px` }}>
                 <header className="sidebar-header">
                     <h3>{workspace.name}</h3>
                     <button className="btn-back" onClick={onBackToWorkspaces} title="Back to workspaces">
@@ -303,6 +336,7 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                     </div>
                 </footer>
             </aside>
+            <div className="sidebar-resizer" onMouseDown={startResize} />
 
             {/* Main Chat Panel */}
             <main className="chat-main">
