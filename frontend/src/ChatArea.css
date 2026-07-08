@@ -304,18 +304,18 @@
 
 /* Sidebar Navigation Tabs */
 .sidebar-tabs {
-    display: flex;
-    padding: 10px 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 12px 16px;
     gap: 8px;
     border-bottom: 1px solid var(--border-color);
 }
 
 .tab-btn {
-    flex: 1;
     background: none;
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
-    padding: 8px 12px;
+    padding: 8px 6px;
     border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 13px;

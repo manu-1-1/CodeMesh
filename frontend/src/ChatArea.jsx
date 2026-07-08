@@ -329,7 +329,7 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                                             <span className="user-avatar message-avatar">
                                                 {getUserInitials(msg.sender?.name || msg.sender?.username)}
                                             </span>
-                                            <div className="message-content-wrapper" style={{ width: '100%' }}>
+                                            <div className="message-content-wrapper" style={{ flex: 1, minWidth: 0 }}>
                                                 <div className="message-meta">
                                                     <span className="message-sender">{msg.sender?.name || 'User'}</span>
                                                     <span className="message-time">
@@ -355,10 +355,10 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                                                         <button type="button" className="btn-secondary" onClick={() => setEditingMessageId(null)} style={{ padding: '4px 8px', fontSize: '0.8rem' }}>Cancel</button>
                                                     </form>
                                                 ) : (
-                                                    <div className="message-body" style={{ display: 'flex', justifyContent: 'between', alignItems: 'center' }}>
-                                                        <span>{msg.content}</span>
+                                                    <div className="message-body" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+                                                        <span style={{ wordBreak: 'break-word', flex: 1 }}>{msg.content}</span>
                                                         {isOwnMessage && (
-                                                            <div className="message-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+                                                            <div className="message-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '8px', flexShrink: 0 }}>
                                                                 <button
                                                                     onClick={() => {
                                                                         setEditingMessageId(msg.id);
