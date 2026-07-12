@@ -101,7 +101,7 @@ export default function WorkspaceSelector({ user, onSelectWorkspace, onLogout, o
                     <h1 className="workspace-title">Your Workspaces</h1>
                     <p className="workspace-subtitle">Select a workspace or create a new one to start collaborating.</p>
                 </div>
-                
+
                 <div className="user-section">
                     {user && (
                         <div className="user-info">
@@ -110,7 +110,7 @@ export default function WorkspaceSelector({ user, onSelectWorkspace, onLogout, o
                         </div>
                     )}
                     <button className="btn-secondary" onClick={() => setIsProfileModalOpen(true)} style={{ padding: '8px 16px' }}>
-                        Edit Profile
+                        ⚙️
                     </button>
                     <button className="btn-logout" onClick={onLogout}>
                         Logout
