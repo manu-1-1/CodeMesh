@@ -31,6 +31,7 @@ export default function App() {
   if (!currentWorkspace) {
     return (
       <WorkspaceSelector
+        user={user}
         onSelectWorkspace={(ws) => setCurrentWorkspace(ws)}
         onLogout={handleLogout}
       />

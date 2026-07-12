@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
 import './WorkspaceSelector.css';
 
-export default function WorkspaceSelector({ onSelectWorkspace, onLogout }) {
+export default function WorkspaceSelector({ user, onSelectWorkspace, onLogout }) {
     const [workspaces, setWorkspaces] = useState([]);
     const [invitations, setInvitations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -99,9 +99,18 @@ export default function WorkspaceSelector({ onSelectWorkspace, onLogout }) {
                     <h1 className="workspace-title">Your Workspaces</h1>
                     <p className="workspace-subtitle">Select a workspace or create a new one to start collaborating.</p>
                 </div>
-                <button className="btn-logout" onClick={onLogout}>
-                    Logout
-                </button>
+                
+                <div className="user-section">
+                    {user && (
+                        <div className="user-info">
+                            <span className="user-name">Welcome, {user.name}</span>
+                            <span className="user-email">{user.email}</span>
+                        </div>
+                    )}
+                    <button className="btn-logout" onClick={onLogout}>
+                        Logout
+                    </button>
+                </div>
             </header>
             {error && <div className="alert alert-error">{error}</div>}
 

@@ -202,4 +202,28 @@
     background-color: var(--bg-secondary);
     color: var(--text-primary);
     border-color: var(--border-focus);
+}
+
+/* User Info Section */
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+.user-email {
+    font-size: 13px;
+    color: var(--text-secondary);
 }
