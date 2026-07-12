@@ -34,6 +34,7 @@ export default function App() {
         user={user}
         onSelectWorkspace={(ws) => setCurrentWorkspace(ws)}
         onLogout={handleLogout}
+        onUserUpdate={(updatedUser) => setUser(updatedUser)}
       />
     );
   }

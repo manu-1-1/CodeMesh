@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
+import UserProfileModal from './UserProfileModal';
 import './WorkspaceSelector.css';
 
-export default function WorkspaceSelector({ user, onSelectWorkspace, onLogout }) {
+export default function WorkspaceSelector({ user, onSelectWorkspace, onLogout, onUserUpdate }) {
     const [workspaces, setWorkspaces] = useState([]);
     const [invitations, setInvitations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -10,6 +11,7 @@ export default function WorkspaceSelector({ user, onSelectWorkspace, onLogout })
     const [newWorkspaceName, setNewWorkspaceName] = useState('');
     const [newWorkspaceDesc, setNewWorkspaceDesc] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     const fetchWorkspaces = async () => {
         try {
@@ -107,6 +109,9 @@ export default function WorkspaceSelector({ user, onSelectWorkspace, onLogout })
                             <span className="user-email">{user.email}</span>
                         </div>
                     )}
+                    <button className="btn-secondary" onClick={() => setIsProfileModalOpen(true)} style={{ padding: '8px 16px' }}>
+                        Edit Profile
+                    </button>
                     <button className="btn-logout" onClick={onLogout}>
                         Logout
                     </button>
@@ -185,6 +190,14 @@ export default function WorkspaceSelector({ user, onSelectWorkspace, onLogout })
                     </button>
                 </form>
             </div>
+
+            {isProfileModalOpen && (
+                <UserProfileModal
+                    currentUser={user}
+                    onClose={() => setIsProfileModalOpen(false)}
+                    onUserUpdate={onUserUpdate}
+                />
+            )}
         </div>
     );
 }
