@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
+import { MessageSquare, Code, Github, Settings, Edit2, Trash2 } from 'lucide-react';
 import './SnippetsArea.css';
 export default function SnippetsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, sidebarWidth, startResize }) {
     const [snippets, setSnippets] = useState([]);
@@ -157,25 +158,25 @@ export default function SnippetsArea({ workspace, currentUser, onBackToWorkspace
                         className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
                         onClick={() => setActiveTab('chat')}
                     >
-                        💬 Chat
+                        <MessageSquare size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> Chat
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'snippets' ? 'active' : ''}`}
                         onClick={() => setActiveTab('snippets')}
                     >
-                        💻 Snippets
+                        <Code size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> Snippets
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'github' ? 'active' : ''}`}
                         onClick={() => setActiveTab('github')}
                     >
-                        🐙 GitHub
+                        <Github size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> GitHub
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
                         onClick={() => setActiveTab('settings')}
                     >
-                        ⚙️ Settings
+                        <Settings size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> Settings
                     </button>
                 </div>
 

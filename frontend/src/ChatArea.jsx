@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { apiRequest } from './api';
+import { MessageSquare, Code, Github, Settings, Edit2, Trash2 } from 'lucide-react';
 import './ChatArea.css'; // Importing its own separate stylesheet
 import SnippetsArea from './SnippetsArea';
 import GitHubArea from './GitHubArea';
@@ -268,25 +269,25 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                         className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
                         onClick={() => setActiveTab('chat')}
                     >
-                        💬 Chat
+                        <MessageSquare size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> Chat
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'snippets' ? 'active' : ''}`}
                         onClick={() => setActiveTab('snippets')}
                     >
-                        💻 Snippets
+                        <Code size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> Snippets
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'github' ? 'active' : ''}`}
                         onClick={() => setActiveTab('github')}
                     >
-                        🐙 GitHub
+                        <Github size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> GitHub
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
                         onClick={() => setActiveTab('settings')}
                     >
-                        ⚙️ Settings
+                        <Settings size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> Settings
                     </button>
                 </div>
 
@@ -400,13 +401,13 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
                                                                     }}
                                                                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', opacity: 0.6 }}
                                                                 >
-                                                                    ✏️
+                                                                    <Edit2 size={14} />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDeleteMessage(msg.id)}
                                                                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', opacity: 0.6 }}
                                                                 >
-                                                                    🗑️
+                                                                    <Trash2 size={14} />
                                                                 </button>
                                                             </div>
                                                         )}
