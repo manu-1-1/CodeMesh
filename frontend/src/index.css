@@ -174,3 +174,53 @@ body {
 .auth-link:hover {
   text-decoration: underline;
 }
+
+/* Premium Glassmorphism Overrides */
+body {
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.15), transparent 25%);
+    background-attachment: fixed;
+}
+
+.chat-screen-layout, .settings-main, .github-main, .snippets-main {
+    background: transparent !important;
+}
+
+.sidebar {
+    background: rgba(21, 23, 30, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.chat-area, .settings-card, .github-repo-card, .snippet-card, .github-container, .members-list-card, .invite-card {
+    background: rgba(25, 27, 35, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 16px !important;
+}
+
+.tab-btn, .btn-primary, .btn-secondary {
+    transition: all 0.3s ease !important;
+}
+
+.tab-btn.active {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: var(--accent-blue) !important;
+    border-right: 3px solid var(--accent-blue) !important;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.chat-messages {
+    background: transparent !important;
+}
+
+.message-bubble {
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
