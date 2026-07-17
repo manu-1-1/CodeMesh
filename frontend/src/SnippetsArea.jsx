@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
-import { MessageSquare, Code, Github, Settings, Edit2, Trash2 } from 'lucide-react';
+import { MessageSquare, Code, GitBranch, Settings, Edit2, Trash2 } from 'lucide-react';
 import './SnippetsArea.css';
 export default function SnippetsArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, sidebarWidth, startResize }) {
     const [snippets, setSnippets] = useState([]);
@@ -170,7 +170,7 @@ export default function SnippetsArea({ workspace, currentUser, onBackToWorkspace
                         className={`tab-btn ${activeTab === 'github' ? 'active' : ''}`}
                         onClick={() => setActiveTab('github')}
                     >
-                        <Github size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> GitHub
+                        <GitBranch size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> GitHub
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}

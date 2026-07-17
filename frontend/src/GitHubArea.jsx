@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiRequest } from './api';
-import { MessageSquare, Code, Github, Settings, Edit2, Trash2 } from 'lucide-react';
+import { MessageSquare, Code, GitBranch, Settings, Edit2, Trash2 } from 'lucide-react';
 import './GitHubArea.css';
 export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces, members, activeTab, setActiveTab, sidebarWidth, startResize }) {
     const [isConnected, setIsConnected] = useState(false);
-    const [githubUsername, setGithubUsername] = useState('');
+    const [githubUsername, setGitBranchUsername] = useState('');
     const [repos, setRepos] = useState([]);
     const [selectedRepo, setSelectedRepo] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
             const data = await apiRequest(`/github/status?workspaceId=${workspace.id}`);
             setIsConnected(data.connected);
             if (data.connected && data.connection) {
-                setGithubUsername(data.connection.githubUsername);
+                setGitBranchUsername(data.connection.githubUsername);
             }
         } catch (err) {
             console.error('Failed to fetch github status:', err);
@@ -59,7 +59,7 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
                 })
             });
             setIsConnected(true);
-            setGithubUsername(usernameInput.trim());
+            setGitBranchUsername(usernameInput.trim());
             setUsernameInput('');
             setTokenInput('');
             // Trigger automatic sync for the workspace upon connection
@@ -83,7 +83,7 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
                 body: JSON.stringify({ workspaceId: workspace.id })
             });
             setIsConnected(false);
-            setGithubUsername('');
+            setGitBranchUsername('');
             setRepos([]);
             setSelectedRepo(null);
         } catch (err) {
@@ -157,7 +157,7 @@ export default function GitHubArea({ workspace, currentUser, onBackToWorkspaces,
                         className={`tab-btn ${activeTab === 'github' ? 'active' : ''}`}
                         onClick={() => setActiveTab('github')}
                     >
-                        <Github size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> GitHub
+                        <GitBranch size={16} style={{marginRight: "6px", verticalAlign: "middle"}} /> GitHub
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
