@@ -1,12 +1,12 @@
 # CodeMesh MVP Extensions & Message Editing/Deletion Summary (Phase 8)
 
-This document describes the design, code changes, and verification of the **MVP Extensions & Chat Features** implemented today. These features finalize the initial real-time communication scope of CodeMesh.
+This document describes my design, code changes, and verification of the **MVP Extensions & Chat Features** implemented today. These features finalize the initial real-time communication scope of CodeMesh.
 
 ---
 
 ## 1. What Was Accomplished Today
 
-We completed the implementation of remaining functional requirements from the Version 1 MVP:
+I completed the implementation of remaining functional requirements from the Version 1 MVP:
 1. **User Settings & Authentication Extensions**: Created the `/api/v1/users` endpoint router allowing profile updates (name and avatar URL) and secure password updates.
 2. **Workspace & Administration Extensions**: Implemented the Leave Workspace action and the Promote/Demote Member Role action.
 3. **Message Edit/Delete Capabilities**: Expanded the WebSocket real-time chat service to handle message edits (marking them as `edited: true` in the database) and deletions (physically removing them), with live broadcasts to channel rooms.
@@ -14,7 +14,7 @@ We completed the implementation of remaining functional requirements from the Ve
 
 ---
 
-## 2. Why We Implemented This & Practical Rationale
+## 2. Why I Implemented This & Practical Rationale
 
 ### Account Integrity & Settings
 Providing `PUT /profile` and `PUT /password` gives users control over their profile data and security. Password updates run through `bcrypt` validation to prevent arbitrary overwrites, checking the `oldPassword` hash before hashing and storing the `newPassword`.

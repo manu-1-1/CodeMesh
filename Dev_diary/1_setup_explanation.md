@@ -1,12 +1,12 @@
 # CodeMesh Development & Architecture Guide
 
-Welcome to the development guide for **CodeMesh**! This document explains the architecture decisions, database models, technical challenges, and setup details for everything built in the project so far.
+Welcome to my development guide for **CodeMesh**! This document explains my architecture decisions, database models, technical challenges, and setup details for everything I have built in the project so far.
 
 ---
 
 ## 1. Project Initialization & Architecture
 
-We set up the backend service using **Node.js (JavaScript)** with modern **ES Modules** (`import`/`export` syntax). 
+I set up the backend service using **Node.js (JavaScript)** with modern **ES Modules** (`import`/`export` syntax). 
 
 ### Key Dependencies
 * **Express**: Fast, unopinionated, minimalist web framework for Node.js.
@@ -14,7 +14,7 @@ We set up the backend service using **Node.js (JavaScript)** with modern **ES Mo
 * **nodemon**: Monitors files for changes and automatically restarts the server to speed up development.
 
 ### Code Organization (`backend/src/`)
-Our code follows a clean, modular architecture:
+My code follows a clean, modular architecture:
 ```text
 backend/
 ├── prisma/
@@ -33,7 +33,7 @@ backend/
 
 ## 2. Database Schema Design
 
-We defined our core database models in [schema.prisma](file:///d:/Projects/CodeMesh/backend/prisma/schema.prisma):
+I defined my core database models in [schema.prisma](file:///d:/Projects/CodeMesh/backend/prisma/schema.prisma):
 
 ```mermaid
 erDiagram
@@ -77,11 +77,11 @@ erDiagram
 
 ### Problem 1: Special Characters in Password
 The password `op@098` contains an `@` character. Connection strings use the format `postgresql://username:password@hostname:port`. When the database connection parser saw `op@098@localhost`, it tried to find a hostname named `098@localhost` and crashed.
-* **Solution**: We URL-encoded the `@` symbol into `%40`. The password became `op%40098`, allowing the parser to read it successfully.
+* **Solution**: I URL-encoded the `@` symbol into `%40`. The password became `op%40098`, allowing the parser to read it successfully.
 
 ### Problem 2: Prisma 7 Driver Adapter Requirement
 In Prisma 7, the core query engine no longer includes built-in drivers for local databases directly. Instantiating a standard `new PrismaClient()` without arguments throws an error.
-* **Solution**: We installed `pg` and `@prisma/adapter-pg`. In [src/index.js](file:///d:/Projects/CodeMesh/backend/src/index.js), we set up a PostgreSQL connection pool and passed it into Prisma via the `PrismaPg` driver adapter:
+* **Solution**: I installed `pg` and `@prisma/adapter-pg`. In [src/index.js](file:///d:/Projects/CodeMesh/backend/src/index.js), I set up a PostgreSQL connection pool and passed it into Prisma via the `PrismaPg` driver adapter:
   ```javascript
   const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
   const adapter = new PrismaPg(pool);
@@ -92,7 +92,7 @@ In Prisma 7, the core query engine no longer includes built-in drivers for local
 
 ## 4. Authentication & Security (Phase 2)
 
-We implemented a token-based authentication system using **JSON Web Tokens (JWT)** and **bcrypt**.
+I implemented a token-based authentication system using **JSON Web Tokens (JWT)** and **bcrypt**.
 
 ### Workflow
 ```text
@@ -113,12 +113,12 @@ Register / Login request (Plain password)
 
 ### Components Created
 1. **Password Hashing ([auth.js utility](file:///d:/Projects/CodeMesh/backend/src/utils/auth.js))**:
-   Passwords should never be stored in plain text. We use `bcrypt` to hash passwords with `SALT_ROUNDS = 10`. Hashing is a one-way mathematical function; when a user logs in, we hash their input password and compare it to the stored hash.
+   Passwords should never be stored in plain text. I use `bcrypt` to hash passwords with `SALT_ROUNDS = 10`. Hashing is a one-way mathematical function; when a user logs in, I hash their input password and compare it to the stored hash.
 2. **Access Tokens**:
-   We generate a JSON Web Token signed with a private secret (`JWT_SECRET`). It has a 24-hour expiration time.
+   I generate a JSON Web Token signed with a private secret (`JWT_SECRET`). It has a 24-hour expiration time.
 3. **Route Protection ([auth.js middleware](file:///d:/Projects/CodeMesh/backend/src/middleware/auth.js))**:
    Intercepts requests to private routes, reads the `Authorization` header, decodes the token, and attaches the `user.id` to the request object (`req.user`) if the token is valid.
 4. **Endpoints ([auth.js routes](file:///d:/Projects/CodeMesh/backend/src/routes/auth.js))**:
    * `POST /api/v1/auth/register`: Checks for email uniqueness, hashes the password, inserts the user record, and logs the user in by returning a token.
    * `POST /api/v1/auth/login`: Checks if the email exists, verifies the password, and returns a token.
-   * `GET /api/v1/auth/me`: A protected route that uses our middleware to fetch the current user's profile information from the database.
+   * `GET /api/v1/auth/me`: A protected route that uses my middleware to fetch the current user's profile information from the database.

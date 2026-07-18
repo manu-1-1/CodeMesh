@@ -1,29 +1,29 @@
 # Frontend Implementation: Workspace Selection & Real-Time Chat Screens
 
-This document outlines the screens added to the CodeMesh frontend today, the reasoning behind the architectural choices, and a detailed explanation of the code changes.
+This document outlines the screens I added to the CodeMesh frontend today, the reasoning behind my architectural choices, and a detailed explanation of my code changes.
 
 ---
 
 ## 1. Summary of Changes Today
 
-We moved the frontend from a simple mock authentication page to a fully functioning multi-screen application. The workflow now consists of:
-1. **Authentication Screen (`Auth.jsx`)**: Login or register users. We fixed a API payload mismatch where the backend expected `name` but the frontend sent `username`.
+I moved the frontend from a simple mock authentication page to a fully functioning multi-screen application. The workflow now consists of:
+1. **Authentication Screen (`Auth.jsx`)**: Login or register users. I fixed a API payload mismatch where the backend expected `name` but the frontend sent `username`.
 2. **Workspace Selector Screen (`WorkspaceSelector.jsx` & `.css`)**: Allows logged-in users to view their joined workspaces and create new ones.
 3. **Workspace Chat Screen (`ChatArea.jsx` & `.css`)**: Renders a workspace dashboard containing a list of channels, a list of workspace members, and a real-time message thread powered by Socket.IO.
 
 ---
 
-## 2. Why We Implemented These Changes (Design Decisions)
+## 2. Why I Implemented These Changes (Design Decisions)
 
 ### Modular Styling (Separate CSS Files)
-Instead of adding all layout styles into `index.css`, we created individual stylesheets for components:
+Instead of adding all layout styles into `index.css`, I created individual stylesheets for components:
 * `WorkspaceSelector.css` for the workspace dashboard.
 * `ChatArea.css` for the sidebar, messaging panel, and modals.
 
 This structure prevents stylesheet bloat, avoids class name collisions, and keeps styles near the Javascript files that use them.
 
 ### JWT Authentication via WebSockets
-To secure the real-time websocket connection, we passed the JWT from localStorage inside the handshake authentication object when connecting Socket.IO:
+To secure the real-time websocket connection, I passed the JWT from localStorage inside the handshake authentication object when connecting Socket.IO:
 ```javascript
 socketRef.current = io('http://localhost:5000', {
   auth: { token }
@@ -32,7 +32,7 @@ socketRef.current = io('http://localhost:5000', {
 This aligns with the backend socket server middleware, which parses and decodes the token before allowing a socket connection to join channel rooms.
 
 ### Shared State Architecture in App.jsx
-We used `App.jsx` as the central orchestrator to manage state flow:
+I used `App.jsx` as the central orchestrator to manage state flow:
 * `user`: Determines if the login page should be shown.
 * `currentWorkspace`: Determines if the Workspace Selector or the active Workspace Chat view is active.
 
@@ -44,7 +44,7 @@ This simple routing structure makes it easy to switch views without setting up c
 
 ### Auth.jsx API Payload Correction
 * **Problem**: The backend PostgreSQL database schema and registration endpoint expected a `name` field, but the frontend React form state was transmitting `username`. This caused the backend validation middleware to return a `400 Bad Request` error.
-* **Fix**: In `Auth.jsx`, we mapped the form's `username` field to `name` inside the POST payload:
+* **Fix**: In `Auth.jsx`, I mapped the form's `username` field to `name` inside the POST payload:
   ```javascript
   const body = isLogin
       ? { email: formData.email, password: formData.password }
@@ -102,7 +102,7 @@ return (
 
 ## 4. Git History & Pushing Changes
 
-At each step, we committed our progress and pushed the final result to main:
+At each step, I committed my progress and pushed the final result to main:
 1. `Created ui for workspace creation` (WorkspaceSelector component)
 2. `Created css for workspace creation ui`
 3. `Added workspace selector to app.jsx`

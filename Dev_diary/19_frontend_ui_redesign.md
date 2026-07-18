@@ -1,10 +1,10 @@
 # 19 Frontend UI Redesign & Premium Styling
 
-Today, we focused on significantly upgrading the frontend user interface to make it more professional, modern, and aesthetically pleasing. We removed the playful emojis in favor of a clean icon library and introduced a "premium glassmorphism" design language across the application.
+Today, I focused on significantly upgrading the frontend user interface to make it more professional, modern, and aesthetically pleasing. I removed the playful emojis in favor of a clean icon library and introduced a "premium glassmorphism" design language across the application.
 
 ## 1. Redesigning the Workspace Selector
 
-The `WorkspaceSelector` is the first screen users see after logging in. We completely overhauled its CSS and JSX to create a "wow" factor.
+The `WorkspaceSelector` is the first screen users see after logging in. I completely overhauled its CSS and JSX to create a "wow" factor.
 
 **Key Changes:**
 - **Animated Background Blobs:** Added floating gradient blobs to the background to make the page feel alive.
@@ -38,7 +38,7 @@ The `WorkspaceSelector` is the first screen users see after logging in. We compl
 
 ## 2. Global Premium Glassmorphism (`index.css`)
 
-To ensure the professional look carries over into the main workspace areas (Chat, GitHub, Snippets, Settings), we added global CSS overrides. 
+To ensure the professional look carries over into the main workspace areas (Chat, GitHub, Snippets, Settings), I added global CSS overrides. 
 
 **Key Changes:**
 - **Global Gradient Background:** A subtle, fixed radial gradient background on the body.
@@ -62,7 +62,7 @@ body {
 
 ## 3. Professional Iconography (Replacing Emojis)
 
-To make the app feel fully professional, we removed the emojis (💬, 🐙, ⚙️, etc.) that were used in the sidebar navigation menus and replaced them with SVG icons from the `lucide-react` library.
+To make the app feel fully professional, I removed the emojis (💬, 🐙, ⚙️, etc.) that were used in the sidebar navigation menus and replaced them with SVG icons from the `lucide-react` library.
 
 **Key Changes:**
 - Installed `lucide-react` via npm.
@@ -80,7 +80,7 @@ import { MessageSquare, Code, Github, Settings } from 'lucide-react';
 ```
 
 ## Git Commits Made
-To keep the history clean and matching the established style, the work was committed in three distinct steps:
+To keep the history clean and matching the established style, I committed the work in three distinct steps:
 1. `Redesigned workspace selector with premium UI and animations`
 2. `Added global glassmorphism premium styling to index css`
 3. `Replaced emojis with lucide icons in sidebar components`

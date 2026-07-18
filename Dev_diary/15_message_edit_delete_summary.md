@@ -1,12 +1,12 @@
 # Summary: Message Editing and Deletion in Chat Area
 
-This document outlines the implementation of message editing ("updation") and deletion capabilities in the CodeMesh chat frontend, completed on July 4, 2026.
+This document outlines my implementation of message editing ("updation") and deletion capabilities in the CodeMesh chat frontend, completed on July 4, 2026.
 
 ---
 
 ## 1. What was Done
 
-We implemented dynamic message editing and deletion functionality in [ChatArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/ChatArea.jsx). Specifically:
+I implemented dynamic message editing and deletion functionality in [ChatArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/ChatArea.jsx). Specifically:
 1. **Interactive UI Actions**: Added visual controls (✏️ and 🗑️) next to messages.
 2. **Conditional Ownership Rendering**: Ensured that a user can only see these actions on messages they sent (`isOwnMessage` check).
 3. **In-place Editing Form**: Added an inline edit input field when a user clicks the edit button, allowing them to modify their message and save/cancel.
@@ -31,9 +31,9 @@ const [editingMessageId, setEditingMessageId] = useState(null);
 const [editInput, setEditInput] = useState('');
 ```
 
-#### Why we did this:
+#### Why I did this:
 - **`editingMessageId`**: Tracks which specific message card is in "edit mode" (`null` if none). Without this, clicking "Edit" would toggle edit mode for *every* message in the list.
-- **`editInput`**: Holds the temporary draft of the message while the user is typing their edit. We need a separate state for this so that it doesn't conflict with the global message input field (`messageInput`) at the bottom of the chat panel.
+- **`editInput`**: Holds the temporary draft of the message while the user is typing their edit. I need a separate state for this so that it doesn't conflict with the global message input field (`messageInput`) at the bottom of the chat panel.
 
 ---
 
@@ -44,8 +44,8 @@ const isOwnMessage = msg.senderId === currentUser.id;
 const isEditing = editingMessageId === msg.id;
 ```
 
-#### Why we did this:
-- **`isOwnMessage`**: Security and UX boundary. We compare the message sender's ID with the logged-in user's ID to ensure that users are only allowed to edit or delete their own messages.
+#### Why I did this:
+- **`isOwnMessage`**: Security and UX boundary. I compare the message sender's ID with the logged-in user's ID to ensure that users are only allowed to edit or delete their own messages.
 - **`isEditing`**: A boolean flag used to conditionally swap the message text layout with a form text input box when the edit mode is active for this particular message card.
 
 ---
@@ -74,8 +74,8 @@ const isEditing = editingMessageId === msg.id;
 )}
 ```
 
-#### Why we did this:
-- By wrapping the action buttons inside `{isOwnMessage && (...)}`, we prevent unauthorized users from even seeing the edit/delete options.
+#### Why I did this:
+- By wrapping the action buttons inside `{isOwnMessage && (...)}`, I prevent unauthorized users from even seeing the edit/delete options.
 - The `onClick` handler for edit (`✏️`) initializes `editInput` with the current message contents and sets `editingMessageId` so the UI knows to render the input form.
 - The delete (`🗑️`) button triggers `handleDeleteMessage` which asks for confirmation to prevent accidental clicks.
 
@@ -95,6 +95,6 @@ socketRef.current.on('message_deleted', ({ messageId }) => {
 });
 ```
 
-#### Why we did this:
+#### Why I did this:
 - **`message_edited`**: When any user edits their message, the backend broadcasts `message_edited` to all channel listeners. This listener catches the update and runs a `.map()` on the existing messages state to swap the old message with the new, edited version in-place.
 - **`message_deleted`**: When a message is deleted, the backend broadcasts `message_deleted`. This listener removes the message from the local list using `.filter()`, instantly making it disappear from everyone's screens.

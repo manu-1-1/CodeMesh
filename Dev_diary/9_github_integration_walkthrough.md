@@ -1,6 +1,6 @@
 # CodeMesh GitHub Integration Documentation (Phase 9)
 
-This documentation provides a comprehensive walkthrough of what was accomplished today for **Phase 9: GitHub Integration**. It explains the core architectural concepts, details a real-world multi-channel scenario, and breaks down every line of code inside the GitHub route controller with step-by-step explanations, data flows, and sample requests.
+This documentation provides a comprehensive walkthrough of what I accomplished today for **Phase 9: GitHub Integration**. It explains my core architectural concepts, details a real-world multi-channel scenario, and breaks down every line of code inside the GitHub route controller with step-by-step explanations, data flows, and sample requests.
 
 ---
 
@@ -21,7 +21,7 @@ This documentation provides a comprehensive walkthrough of what was accomplished
 
 ## 1. Overview of Accomplishments Today
 
-Today, we successfully extended CodeMesh with the core backend structure for **GitHub Integration**:
+Today, I successfully extended CodeMesh with the core backend structure for **GitHub Integration**:
 1. **Schema Migration**: Modified `schema.prisma` to include relationship fields and 3 new database models (`GitHubConnection`, `Repository`, and `PullRequest`) to map the entities, running the migration successfully on PostgreSQL.
 2. **Endpoint Controller**: Created `backend/src/routes/github.js` containing endpoints for connecting/disconnecting accounts, listing synced repositories, and running transactions to sync repositories and mock pull requests.
 3. **Service Hookup**: Registered the new router inside `backend/src/index.js` under the `/api/v1/github` endpoint path prefix.
@@ -37,8 +37,8 @@ When designing collaborative integrations, it is important to distinguish where 
 
 ### Two-Way Sync Architecture (Webhooks & API Writes)
 The integration operates as a bridge between GitHub and CodeMesh:
-1. **GitHub to CodeMesh (Webhooks)**: When a developer pushes code or opens a PR on GitHub.com, GitHub fires a webhook (an HTTP POST alert) to our CodeMesh server. The server updates the database and broadcasts the update to the mapped room in real-time.
-2. **CodeMesh to GitHub (API Writes)**: When a reviewer approves a submission or writes a comment inside CodeMesh, our server sends a request to the GitHub API using the reviewer's access token, posting the comment directly onto the GitHub website.
+1. **GitHub to CodeMesh (Webhooks)**: When a developer pushes code or opens a PR on GitHub.com, GitHub fires a webhook (an HTTP POST alert) to my CodeMesh server. The server updates the database and broadcasts the update to the mapped room in real-time.
+2. **CodeMesh to GitHub (API Writes)**: When a reviewer approves a submission or writes a comment inside CodeMesh, my server sends a request to the GitHub API using the reviewer's access token, posting the comment directly onto the GitHub website.
 
 ---
 
@@ -68,7 +68,7 @@ sequenceDiagram
     Note over GitHub: Comment appears instantly on GitHub.com!
 ```
 
-1. **Opening a PR**: Sarah opens a PR on GitHub. GitHub sends a webhook to our server.
+1. **Opening a PR**: Sarah opens a PR on GitHub. GitHub sends a webhook to my server.
 2. **Database Sync**: The server saves the repository and PR information to the `Amrita-Devs` workspace storage.
 3. **Targeted Alert**: The server looks up the alert configuration: `api-service` is mapped to `#backend-reviews`. It rings the alert bell *only* in the `#backend-reviews` channel.
 4. **Independent Work**: Meanwhile, John opens a frontend PR. Its alert goes *only* to `#frontend-reviews`.

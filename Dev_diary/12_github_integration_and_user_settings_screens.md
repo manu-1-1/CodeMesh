@@ -1,6 +1,6 @@
 # CodeMesh Development Log: GitHub Integration & User Settings Screens (Phase 12)
 
-This document provides a comprehensive summary of the implementation of the **GitHub Integration Screen** and the **User Settings Screen** in CodeMesh today. It details the design choices, architectural changes, code snippets, errors encountered, and how they were diagnosed and resolved.
+This document provides a comprehensive summary of my implementation of the **GitHub Integration Screen** and the **User Settings Screen** in CodeMesh today. It details my design choices, architectural changes, code snippets, errors I encountered, and how they were diagnosed and resolved.
 
 ---
 
@@ -8,7 +8,7 @@ This document provides a comprehensive summary of the implementation of the **Gi
 
 Prior to this phase, the CodeMesh prototype supported Authentication, Workspace Selector, Real-time Chat channels, and Code Snippet sharing with AI reviews. However, the frontend was missing views to configure user profiles, change passwords, leave workspaces, and connect to GitHub repositories to review synchronized pull requests.
 
-Today, we accomplished the following:
+Today, I accomplished the following:
 1. **Added Backend Connection Check**: Implemented the `GET /api/v1/github/status` endpoint to report user connection credentials safely.
 2. **Added Global State Updater**: Threaded an `onUserUpdate` prop from `App.jsx` to update the active user's state globally across all screens upon updating their name or avatar URL.
 3. **Created Screen 1 - GitHub Integration (`GitHubArea`)**: Built a tab-routing view allowing users to connect their account, manually sync repositories, and view pull requests for selected repositories.
@@ -20,17 +20,17 @@ Today, we accomplished the following:
 ## 2. Technical & Design Decisions
 
 ### Modular Sidebar Copying vs. Tab States
-We maintained the existing sidebar layout pattern by passing `activeTab` and `setActiveTab` to our screens. If a user is viewing GitHub or Settings, the sidebar remains on the left to offer continuous context, while the main dashboard area replaces the message thread with settings grids or repository cards.
+I maintained the existing sidebar layout pattern by passing `activeTab` and `setActiveTab` to my screens. If a user is viewing GitHub or Settings, the sidebar remains on the left to offer continuous context, while the main dashboard area replaces the message thread with settings grids or repository cards.
 
 ### ESM Path-Resolved Env Loading
-The backend server uses native Node.js ESM environment loading. However, running commands from nested directories (like `backend/src`) shifts the Current Working Directory (CWD), breaking standard `dotenv.config()` lookups. We resolved this by resolving the path to `.env` relative to the module file path (`import.meta.url`) in `prisma.js`.
+The backend server uses native Node.js ESM environment loading. However, running commands from nested directories (like `backend/src`) shifts the Current Working Directory (CWD), breaking standard `dotenv.config()` lookups. I resolved this by resolving the path to `.env` relative to the module file path (`import.meta.url`) in `prisma.js`.
 
 ---
 
 ## 3. Code Explanations
 
 ### A. Backend Status Check (`backend/src/routes/github.js`)
-We registered a new endpoint to query if the user has an active connection row in the database:
+I registered a new endpoint to query if the user has an active connection row in the database:
 ```javascript
 router.get('/status', async (req, res) => {
     const userId = req.user.id;
@@ -55,7 +55,7 @@ router.get('/status', async (req, res) => {
 *   **Why**: Instead of letting the frontend guess the status or wait for a failed sync query to detect disconnection, this allows clean status checks on tab mount.
 
 ### B. Global State Hookup (`frontend/src/App.jsx`)
-We passed the user update callback to the main container component:
+I passed the user update callback to the main container component:
 ```javascript
   return (
     <ChatArea
@@ -66,10 +66,10 @@ We passed the user update callback to the main container component:
     />
   );
 ```
-*   **Why**: When profile changes occur on the Settings page, we save them to `localStorage` and bubble up the updated object to the root `App` state. This triggers a re-render so all other screens (like the sidebar footer avatar and name) update instantly.
+*   **Why**: When profile changes occur on the Settings page, they are saved to `localStorage` and bubbled up to the root `App` state. This triggers a re-render so all other screens (like the sidebar footer avatar and name) update instantly.
 
 ### C. Sidebar View Coordinator (`frontend/src/ChatArea.jsx`)
-We imported `GitHubArea` and `SettingsArea` and configured early return rendering:
+I imported `GitHubArea` and `SettingsArea` and configured early return rendering:
 ```javascript
     if (activeTab === 'github') {
         return (
@@ -148,7 +148,7 @@ And added the tab buttons:
 
 ## 5. Verification Results
 
-We verified all functions by rebuilding and running the test scripts:
+I verified all functions by rebuilding and running the test scripts:
 1. **Build Success**: Running `npm run build` inside `frontend/` builds client modules with no errors.
 2. **Auth Integration Test**: Running `node test_auth.js` completes with code `201` for registration and `200` for credentials logging.
 3. **Settings Live Updates**: Saving profile name updates locally and in memory propagates up and redraws sidebar items cleanly.

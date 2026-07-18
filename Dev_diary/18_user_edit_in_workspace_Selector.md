@@ -1,14 +1,14 @@
 # CodeMesh: User Profile & Workspace Selector Updates
 
-This document summarizes the changes made to the CodeMesh frontend today. The focus was on improving the user experience during the workspace selection phase by providing clear visibility of the user's active session and offering an easy way to manage their profile details.
+This document summarizes the changes I made to the CodeMesh frontend today. My focus was on improving the user experience during the workspace selection phase by providing clear visibility of the user's active session and offering an easy way to manage their profile details.
 
 ## 1. Adding the User Information Section
 
-### Why we did this:
+### Why I did this:
 Before these changes, users who logged in saw a list of workspaces but lacked a visual confirmation of *who* they were logged in as. By adding the user's name and email next to the logout button, users can quickly verify their active identity before entering a workspace.
 
 ### How it works:
-We passed the active `user` state down from the main `App` component into the `WorkspaceSelector`.
+I passed the active `user` state down from the main `App` component into the `WorkspaceSelector`.
 
 **`App.jsx`**:
 ```jsx
@@ -25,7 +25,7 @@ if (!currentWorkspace) {
 ```
 
 **`WorkspaceSelector.jsx`**:
-We updated the header to render a new `.user-section` div that safely checks if `user` exists before displaying the name and email.
+I updated the header to render a new `.user-section` div that safely checks if `user` exists before displaying the name and email.
 ```jsx
 <div className="user-section">
     {user && (
@@ -39,7 +39,7 @@ We updated the header to render a new `.user-section` div that safely checks if 
 ```
 
 **`WorkspaceSelector.css`**:
-We applied Flexbox to ensure the text aligned neatly next to the buttons.
+I applied Flexbox to ensure the text aligned neatly next to the buttons.
 ```css
 .user-section {
     display: flex;
@@ -57,11 +57,11 @@ We applied Flexbox to ensure the text aligned neatly next to the buttons.
 
 ## 2. Adding the "Edit Profile" Modal
 
-### Why we did this:
+### Why I did this:
 While users could edit their profiles inside a workspace (via `SettingsArea`), forcing a user to enter a workspace just to fix a typo in their name or update an avatar is poor UX. Adding an "Edit Profile" modal directly to the `WorkspaceSelector` provides a global, centralized place for account management.
 
 ### How it works:
-We built a standalone modal component and integrated it into the workspace selector. To ensure the UI updates instantly after a change, we hoisted the state update function back up to `App.jsx`.
+I built a standalone modal component and integrated it into the workspace selector. To ensure the UI updates instantly after a change, I hoisted the state update function back up to `App.jsx`.
 
 **`UserProfileModal.jsx`**:
 This new component maintains its own local state for form inputs (`name` and `avatarUrl`). When submitted, it hits the existing backend API (`PUT /users/profile`), updates the browser's `localStorage`, and calls `onUserUpdate` to notify the parent app of the changes.
@@ -83,7 +83,7 @@ const handleUpdateProfile = async (e) => {
 ```
 
 **`WorkspaceSelector.jsx` (Integration)**:
-We added a local state `isProfileModalOpen` to toggle the visibility of the modal. We also replaced the text button with a clean gear icon (⚙️) as per your latest commit.
+I added a local state `isProfileModalOpen` to toggle the visibility of the modal. I also replaced the text button with a clean gear icon (⚙️) as per my latest commit.
 
 ```jsx
 const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -104,7 +104,7 @@ const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 ```
 
 **`App.jsx` (State Synchronization)**:
-To complete the loop, we passed `onUserUpdate` into `WorkspaceSelector`. When the modal calls this function, `App.jsx` updates its top-level `user` state, causing the entire React tree to re-render with the fresh profile data.
+To complete the loop, I passed `onUserUpdate` into `WorkspaceSelector`. When the modal calls this function, `App.jsx` updates its top-level `user` state, causing the entire React tree to re-render with the fresh profile data.
 
 ```jsx
 <WorkspaceSelector

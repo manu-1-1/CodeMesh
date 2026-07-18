@@ -1,6 +1,6 @@
 # CodeMesh Development Log: Snippet Sharing & AI Reviews Integration
 
-This document outlines the detailed changes implemented today in CodeMesh, the technical rationale behind the design choices, and explanations of the code modifications.
+This document outlines the detailed changes I implemented today in CodeMesh, the technical rationale behind my design choices, and explanations of my code modifications.
 
 ---
 
@@ -10,14 +10,14 @@ Prior to today's work, the CodeMesh prototype supported Authentication, Workspac
 1. **Code Snippet Sharing**: Sharing script snippets in dedicated workspaces without polluting main chat channels.
 2. **AI Code Review**: Submitting code snippets for instant automated audits.
 
-### Why these changes were made
-- **Backend listing gap**: The backend had snippet routes for CRUD (`POST`, `GET`, `PUT`, `DELETE` by ID), but lacked an endpoint to list all snippets shared within a workspace. We needed a `GET /api/v1/snippets?workspaceId=...` route.
-- **Review associations**: The database model defined a one-to-many relation (`Snippet` -> `CodeReview`), but fetching snippet details did not load its past reviews. We updated the endpoint to include reviews in details payload.
-- **Unified Workspace Experience**: Rather than introducing heavy routing libraries (like React Router) or separate pages, we extended the existing sub-navigation layout inside the main workspace component (`ChatArea`). This maintains standard workspace layouts (like Slack or Discord) and provides a fast toggle between **Chat** and **Snippets**.
+### Why I made these changes
+- **Backend listing gap**: The backend had snippet routes for CRUD (`POST`, `GET`, `PUT`, `DELETE` by ID), but lacked an endpoint to list all snippets shared within a workspace. I needed a `GET /api/v1/snippets?workspaceId=...` route.
+- **Review associations**: The database model defined a one-to-many relation (`Snippet` -> `CodeReview`), but fetching snippet details did not load its past reviews. I updated the endpoint to include reviews in details payload.
+- **Unified Workspace Experience**: Rather than introducing heavy routing libraries (like React Router) or separate pages, I extended the existing sub-navigation layout inside the main workspace component (`ChatArea`). This maintains standard workspace layouts (like Slack or Discord) and provides a fast toggle between **Chat** and **Snippets**.
 
 ### Product Design: Separation of Code Snippets from General Chat Channels
 
-Mixing code sharing and reviews into general chat channels creates friction. We separated them due to the following structural and design considerations:
+Mixing code sharing and reviews into general chat channels creates friction. I separated them due to the following structural and design considerations:
 
 1. **Noise and Ephemerality in Chat**:
    - General channels are high-velocity streams designed for messages, announcements, and quick standup updates. 
@@ -29,7 +29,7 @@ Mixing code sharing and reviews into general chat channels creates friction. We 
 
 3. **Structured Review Audits vs. Chat Thread Noise**:
    - An AI review generates formal static reports (Security risks, performance costs, and quality checklists).
-   - If reviews were posted as standard channel messages, this structured audit history would get lost in active conversation threads. By separating snippets, we create a persistent audit trail linked directly to specific code versions.
+   - If reviews were posted as standard channel messages, this structured audit history would get lost in active conversation threads. By separating snippets, I create a persistent audit trail linked directly to specific code versions.
 
 4. **Action Hooks and State Mapping**:
    - The Snippet area has specific actions: "Request AI Review", "Select Language", "Search by code metadata". These custom buttons and states do not map cleanly onto general channel message inputs.
@@ -42,7 +42,7 @@ Mixing code sharing and reviews into general chat channels creates friction. We 
 File: [snippets.js](file:///d:/Projects/CodeMesh/backend/src/routes/snippets.js)
 
 #### 1. Listing Workspace Snippets (`GET /`)
-We added a new endpoint that retrieves all snippets for a given workspace.
+I added a new endpoint that retrieves all snippets for a given workspace.
 ```javascript
 router.get('/', async (req, res) => {
     const { workspaceId } = req.query;
@@ -83,7 +83,7 @@ router.get('/', async (req, res) => {
 - **Includes**: The `author` relation is joined to display the creator's name on the sidebar list items.
 
 #### 2. Detailed Snippet Retrieval with Reviews (`GET /:snippetId`)
-We updated the existing snippet details fetcher to pull associated reviews.
+I updated the existing snippet details fetcher to pull associated reviews.
 ```javascript
         const snippet = await prisma.snippet.findUnique({
             where: { id: snippetId },
@@ -104,10 +104,10 @@ We updated the existing snippet details fetcher to pull associated reviews.
 ### B. Frontend - Routing & Tab Setup
 Files: [ChatArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/ChatArea.jsx) & [ChatArea.css](file:///d:/Projects/CodeMesh/frontend/src/ChatArea.css)
 
-We implemented an `activeTab` navigation toggle state (`'chat'` or `'snippets'`).
+I implemented an `activeTab` navigation toggle state (`'chat'` or `'snippets'`).
 
 #### 1. Conditional Routing
-Inside the render method of `ChatArea.jsx`, we intercept state before return:
+Inside the render method of `ChatArea.jsx`, I intercept state before return:
 ```javascript
     if (activeTab === 'snippets') {
         return (
@@ -122,7 +122,7 @@ Inside the render method of `ChatArea.jsx`, we intercept state before return:
         );
     }
 ```
-- **Why**: If `'snippets'` is clicked, we pass control to `SnippetsArea`. Passing `activeTab` and `setActiveTab` lets `SnippetsArea` render the exact same sidebar header structure and allows switching back to chat.
+- **Why**: If `'snippets'` is clicked, control is passed to `SnippetsArea`. Passing `activeTab` and `setActiveTab` lets `SnippetsArea` render the exact same sidebar header structure and allows switching back to chat.
 
 #### 2. Navigation Styling
 Buttons inside `.sidebar-tabs` use flex layouts and transitions for hover states:
@@ -151,7 +151,7 @@ Buttons inside `.sidebar-tabs` use flex layouts and transitions for hover states
 ### C. Frontend - Code Snippets & Review Screen
 Files: [SnippetsArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/SnippetsArea.jsx) & [SnippetsArea.css](file:///d:/Projects/CodeMesh/frontend/src/SnippetsArea.css)
 
-This is the primary modular screen built today. It contains three layout columns:
+This is the primary modular screen I built today. It contains three layout columns:
 1. **Left Sidebar Column**: Shared snippets list + filter query input + "Add" modal button.
 2. **Center Column (Code Viewer)**: Displaying code content.
 3. **Right Column (AI Review Panel)**: Triggering and viewing code reports.
@@ -159,7 +159,7 @@ This is the primary modular screen built today. It contains three layout columns
 #### Key Features in `SnippetsArea.jsx`
 
 #### 1. Code Editor Layout with Line Numbers
-We parse the snippet source code string and split it by newline (`\n`) to generate dynamic line numbers matching the height of code text lines:
+I parse the snippet source code string and split it by newline (`\n`) to generate dynamic line numbers matching the height of code text lines:
 ```jsx
 <div className="editor-container">
     <div className="line-numbers">
@@ -175,7 +175,7 @@ We parse the snippet source code string and split it by newline (`\n`) to genera
 Combined with CSS rules (e.g. JetBrains Mono font, fixed line-height matching `.line-num`, and custom selection colors), this builds an IDE-like interface.
 
 #### 2. Parsing Review Log Strings into Colored Cards
-The backend AI reviewer returns a flat string (`summary`). To give this a premium dashboard aesthetic, we wrote a client-side parser to read severity patterns and split them:
+The backend AI reviewer returns a flat string (`summary`). To give this a premium dashboard aesthetic, I wrote a client-side parser to read severity patterns and split them:
 ```javascript
 const parseReviewFindings = (summary) => {
     if (!summary) return [];
@@ -235,4 +235,4 @@ sequenceDiagram
     Front-->>User: Render styled alert cards (Red/Yellow/Green)
 ```
 
-This updates our MVP workspace to offer fully functional, interactive developer environments!
+This updates my MVP workspace to offer fully functional, interactive developer environments!

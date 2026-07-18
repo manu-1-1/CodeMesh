@@ -1,12 +1,12 @@
 # CodeMesh Development Log: Workspace Detail Configuration & Deletion (Phase 14)
 
-This document provides a detailed log of the implementation of the **Workspace Configuration Management** and **Double-Confirmation Deletion Flow** in CodeMesh today. It details the design choices, architectural changes, code explanations, and the troubleshooting steps resolved during development.
+This document provides a detailed log of my implementation of the **Workspace Configuration Management** and **Double-Confirmation Deletion Flow** in CodeMesh today. It details my design choices, architectural changes, code explanations, and the troubleshooting steps resolved during development.
 
 ---
 
 ## 1. Overview of Accomplishments Today
 
-Today, we filled a major administrative gap by enabling Workspace Owners to configure workspace metadata and perform double-confirmation deletions from the frontend interface.
+Today, I filled a major administrative gap by enabling Workspace Owners to configure workspace metadata and perform double-confirmation deletions from the frontend interface.
 
 1. **Integrated Workspace Configuration Form**:
    - Built a dynamic **Workspace Details** card inside [SettingsArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/SettingsArea.jsx) visible exclusively to users with the `OWNER` role.
@@ -24,19 +24,19 @@ Today, we filled a major administrative gap by enabling Workspace Owners to conf
 ## 2. Technical & Design Decisions
 
 ### Instant State Syncing via Parent Callbacks
-When the Workspace Owner changes the name of a workspace, it must instantly synchronize with the sidebar header and the Workspace Selector without forcing the user to log out or reload the browser. By threading the `onWorkspaceUpdate` state modifier from [App.jsx](file:///d:/Projects/CodeMesh/frontend/src/App.jsx) down through [ChatArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/ChatArea.jsx) to [SettingsArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/SettingsArea.jsx), we ensure that the global state is modified in place, causing all workspace header titles to re-render in real time.
+When the Workspace Owner changes the name of a workspace, it must instantly synchronize with the sidebar header and the Workspace Selector without forcing the user to log out or reload the browser. By threading the `onWorkspaceUpdate` state modifier from [App.jsx](file:///d:/Projects/CodeMesh/frontend/src/App.jsx) down through [ChatArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/ChatArea.jsx) to [SettingsArea.jsx](file:///d:/Projects/CodeMesh/frontend/src/SettingsArea.jsx), I ensure that the global state is modified in place, causing all workspace header titles to re-render in real time.
 
 ### Secure Double-Confirmation for Destructive Actions
 Deleting a workspace permanently drops all associated channels, message histories, snippets, and integrated settings. To prevent critical human errors:
-1. We trigger an initial native confirmation dialog (`window.confirm`).
-2. We require the owner to explicitly type out the exact workspace name in a text prompt (`window.prompt`) before sending the `DELETE` request to the backend.
+1. I trigger an initial native confirmation dialog (`window.confirm`).
+2. I require the owner to explicitly type out the exact workspace name in a text prompt (`window.prompt`) before sending the `DELETE` request to the backend.
 
 ---
 
 ## 3. Code Explanations
 
 ### A. Root State Upgrades (`frontend/src/App.jsx`)
-We passed the workspace update callback down to `ChatArea`:
+I passed the workspace update callback down to `ChatArea`:
 ```javascript
   return (
     <ChatArea
@@ -51,7 +51,7 @@ We passed the workspace update callback down to `ChatArea`:
 *   **Why**: This updates the active `currentWorkspace` object in the central App component.
 
 ### B. Intermediate Prop Threading (`frontend/src/ChatArea.jsx`)
-We intercepted and destructured the workspace callback prop to deliver it to the Settings Area tab view:
+I intercepted and destructured the workspace callback prop to deliver it to the Settings Area tab view:
 ```javascript
 export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, onUserUpdate, onWorkspaceUpdate }) {
     // ...
@@ -74,7 +74,7 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
 *   **Why**: It allows the settings tab to execute actions that bubble back up to the main router.
 
 ### C. Workspace Actions Handlers (`frontend/src/SettingsArea.jsx`)
-We registered the PUT and DELETE REST request hooks inside Settings:
+I registered the PUT and DELETE REST request hooks inside Settings:
 ```javascript
     const handleUpdateWorkspace = async (e) => {
         e.preventDefault();

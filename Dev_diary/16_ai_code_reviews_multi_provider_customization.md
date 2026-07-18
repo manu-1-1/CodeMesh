@@ -1,6 +1,6 @@
 # AI Code Review Customization & Multi-Provider Integration
 
-This document outlines the architecture, database schema, backend API logic, frontend settings panel, and style adjustments implemented to add user-configurable AI Code Reviews (supporting Ollama, OpenAI, Anthropic/Claude, and Google Gemini).
+This document outlines the architecture, database schema, backend API logic, frontend settings panel, and style adjustments I implemented to add user-configurable AI Code Reviews (supporting Ollama, OpenAI, Anthropic/Claude, and Google Gemini).
 
 ---
 
@@ -19,7 +19,7 @@ Originally, CodeMesh used a mock rules-based review scanner. The updated system 
 ### A. Database Schema
 **File**: [schema.prisma](file:///d:/Projects/CodeMesh/backend/prisma/schema.prisma)
 
-We added columns to the `User` model to persist preferences:
+I added columns to the `User` model to persist preferences:
 ```prisma
 model User {
   id               String            @id @default(uuid())
@@ -52,7 +52,7 @@ model User {
 ### B. User Profile APIs
 **File**: [users.js](file:///d:/Projects/CodeMesh/backend/src/routes/users.js)
 
-We added a GET endpoint to load settings on-demand (with masked API keys) and updated the profile PUT endpoint to handle updates securely.
+I added a GET endpoint to load settings on-demand (with masked API keys) and updated the profile PUT endpoint to handle updates securely.
 
 #### 1. On-Demand Getter (Masking API Keys)
 ```javascript
@@ -129,7 +129,7 @@ router.put('/profile', async (req, res) => {
 ### C. Review Execution Route
 **File**: [reviews.js](file:///d:/Projects/CodeMesh/backend/src/routes/reviews.js)
 
-We modified the endpoint to run asynchronously and pass user-specific database configurations:
+I modified the endpoint to run asynchronously and pass user-specific database configurations:
 ```javascript
 router.post('/', async (req, res) => {
     const { snippetId } = req.body;
@@ -256,7 +256,7 @@ const systemPrompt = "You are a professional, security-focused code review assis
 ### F. Styling and Scrolling Fixes
 **File**: [SnippetsArea.css](file:///d:/Projects/CodeMesh/frontend/src/SnippetsArea.css)
 
-Flexbox elements default to `min-height: auto`, which causes containers containing large lists of review history cards to expand rather than clip and scroll. We applied `min-height: 0` constraints to the flex layouts to enforce viewport bounds and allow proper overflow scrolling:
+Flexbox elements default to `min-height: auto`, which causes containers containing large lists of review history cards to expand rather than clip and scroll. I applied `min-height: 0` constraints to the flex layouts to enforce viewport bounds and allow proper overflow scrolling:
 ```css
 .snippets-grid {
     display: grid;

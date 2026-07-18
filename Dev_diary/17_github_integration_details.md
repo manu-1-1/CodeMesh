@@ -1,29 +1,29 @@
 # Workspace-Scoped Real GitHub Integration & Optimizations
 
-This document explains the architecture, changes, reasoning, and final code implemented for the workspace-scoped real GitHub Integration in CodeMesh.
+This document explains the architecture, my changes, my reasoning, and the final code I implemented for the workspace-scoped real GitHub Integration in CodeMesh.
 
 ---
 
-## 1. What We Did & Why We Did It
+## 1. What I Did & Why I Did It
 
 ### A. Scoped GitHub Integration per Workspace
-* **What**: We shifted the `GitHubConnection` model in the database from being associated 1-to-1 with a **User** to being associated 1-to-1 with a **Workspace**.
+* **What**: I shifted the `GitHubConnection` model in the database from being associated 1-to-1 with a **User** to being associated 1-to-1 with a **Workspace**.
 * **Why**: Originally, connecting a GitHub account applied globally to the user. However, a developer often works in multiple workspaces (e.g., personal projects vs. client projects), which require different GitHub accounts or Personal Access Tokens (PATs). Scoping the connection to the Workspace enables completely independent settings per workspace.
 
 ### B. Real GitHub API Integration
-* **What**: We replaced the mock backend data (static arrays of repos and PRs) with live fetches to GitHub's REST API.
+* **What**: I replaced the mock backend data (static arrays of repos and PRs) with live fetches to GitHub's REST API.
 * **Why**: To provide real-world functionality where actual repositories and open/closed Pull Requests are synchronized from GitHub.
 
 ### C. Parallel Fetching & Transaction Optimization
-* **What**: We restructured the `/sync` backend endpoint to make all network requests (`fetch` calls to GitHub) in parallel *outside* the database transaction, then executed a single quick transaction to save the records.
+* **What**: I restructured the `/sync` backend endpoint to make all network requests (`fetch` calls to GitHub) in parallel *outside* the database transaction, then executed a single quick transaction to save the records.
 * **Why**: Slow network requests inside interactive database transactions hold database connections open. For users with multiple repositories, this easily exceeded Prisma's default 5-second timeout, throwing `500 Internal Server Error` (Prisma error `P2028`). Running network calls in parallel outside the transaction reduced the database operation time to under 50ms.
 
 ### D. Token Repository Selection Filter (Public Repos Filter)
-* **What**: We added a check on the collaborator permission endpoint (`GET /repos/{owner}/{repo}/collaborators/{username}/permission`) for each repository returned by the API. 
-* **Why**: When a user limits a Fine-Grained Personal Access Token to "Only select repositories", GitHub's `GET /user/repos` endpoint still lists all public repositories the user owns/contributes to because they are public. However, the token cannot perform privileged tasks or write tasks on unselected repos. Checking collaborator permissions returns `403 Forbidden` for unselected repositories, allowing us to filter them out and only display the ones you explicitly authorized.
+* **What**: I added a check on the collaborator permission endpoint (`GET /repos/{owner}/{repo}/collaborators/{username}/permission`) for each repository returned by the API. 
+* **Why**: When a user limits a Fine-Grained Personal Access Token to "Only select repositories", GitHub's `GET /user/repos` endpoint still lists all public repositories the user owns/contributes to because they are public. However, the token cannot perform privileged tasks or write tasks on unselected repos. Checking collaborator permissions returns `403 Forbidden` for unselected repositories, allowing me to filter them out and only display the ones you explicitly authorized.
 
 ### E. Sidebar Disconnect UI Integration
-* **What**: We integrated the connected account name and a disconnect button (❌) directly next to the sync button in the sidebar.
+* **What**: I integrated the connected account name and a disconnect button (❌) directly next to the sync button in the sidebar.
 * **Why**: Previously, the disconnect button was only visible on the "empty details" screen. Since the UI automatically selects the first synced repository on load, the empty details screen was hidden, locking users out of disconnecting or changing their token.
 
 ---
@@ -33,7 +33,7 @@ This document explains the architecture, changes, reasoning, and final code impl
 ### 1. Database Schema Changes
 **File:** [schema.prisma](file:///d:/Projects/CodeMesh/backend/prisma/schema.prisma)
 
-We removed the `githubConnection` field from the `User` model, added it to the `Workspace` model, and updated `GitHubConnection` to map to `workspaceId` instead of `userId`.
+I removed the `githubConnection` field from the `User` model, added it to the `Workspace` model, and updated `GitHubConnection` to map to `workspaceId` instead of `userId`.
 
 ```prisma
 model Workspace {

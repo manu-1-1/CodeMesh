@@ -1,14 +1,14 @@
 # CodeMesh Workspace & Member Management Summary
 
-This document compiles the complete details of today's work implementing the **Workspace and Member Management APIs**. It describes the system architecture, database design, files modified, specific endpoints built, code explanations, and structural rationales.
+This document compiles the complete details of my work implementing the **Workspace and Member Management APIs**. It describes my system architecture, database design, files modified, specific endpoints built, code explanations, and structural rationales.
 
 ---
 
-## 1. Overview of Today's Work
+## 1. Overview of My Work
 
-The primary objective of today's development was to establish **Workspace Isolation and Member Access Control** within CodeMesh. Workspaces are the highest-level organizational boundaries where teams share source files and collaborate. 
+The primary objective of this development was to establish **Workspace Isolation and Member Access Control** within CodeMesh. Workspaces are the highest-level organizational boundaries where teams share source files and collaborate. 
 
-Today we built:
+I built:
 1. **Workspace Lifecycle Endpoints**: Allow users to create, fetch, update, and delete workspaces.
 2. **Access Control List (ACL) & Role Management**: Enable Owners and Admins to invite and remove members.
 3. **Route Integration**: Registered the route module in the main server app file.
@@ -54,7 +54,7 @@ erDiagram
 ### Architectural Highlights
 - **UUID Keys**: Prevents sequential ID enumerations, protecting against dictionary-scanning/ID-enumeration attacks.
 - **Relational Role Mapping**: Storing the user `role` in the relation table (`WorkspaceMember`) rather than on the `User` model allows a single user to be an `OWNER` in Workspace A, an `ADMIN` in Workspace B, and a regular `MEMBER` in Workspace C.
-- **On-Delete Cascades**: If a workspace is deleted, all membership links mapping users to that workspace are automatically cleared to keep the database tidy.
+- **On-Delete Cascades**: If a workspace is deleted, all membership links mapping users to that workspace are automatically cleared to keep my database tidy.
 
 ---
 
@@ -77,10 +77,10 @@ All routes require authentication and are registered under the `/api/v1/workspac
 
 ## 4. Code Breakdown & Technical Explanations
 
-Here is the exact code implemented in [workspaces.js](file:///d:/Projects/CodeMesh/backend/src/routes/workspaces.js), divided by module, along with explanation summaries.
+Here is the exact code I implemented in [workspaces.js](file:///d:/Projects/CodeMesh/backend/src/routes/workspaces.js), divided by module, along with explanation summaries.
 
 ### 4.1 Router Setup & Middleware Application
-We import Express, the shared Prisma client, and our custom JWT-validation middleware. We apply the middleware to all routes inside this file.
+I imported Express, the shared Prisma client, and my custom JWT-validation middleware. I applied the middleware to all routes inside this file.
 ```javascript
 import express from 'express';
 import { prisma } from '../lib/prisma.js';
@@ -139,7 +139,7 @@ router.post('/', async (req, res) => {
     }
 });
 ```
-* **Explanation**: Receives the workspace `name` and `description` from `req.body`. We run the creation logic inside `prisma.$transaction`. 
+* **Explanation**: Receives the workspace `name` and `description` from `req.body`. I run the creation logic inside `prisma.$transaction`. 
 * **Design Decision**: A database transaction is critical here. It ensures that the workspace record and the corresponding membership record are committed *together*. If adding the owner record fails, the workspace creation is automatically rolled back, leaving no database residues.
 
 #### 4.2.2 Fetch User's Workspaces
@@ -180,7 +180,7 @@ router.get('/', async (req, res) => {
     }
 });
 ```
-* **Explanation**: Returns all workspaces where the current user matches any record in `members`. We use `include` to load member details (excluding user password hashes).
+* **Explanation**: Returns all workspaces where the current user matches any record in `members`. I use `include` to load member details (excluding user password hashes).
 
 #### 4.2.3 Fetch Single Workspace
 ```javascript
@@ -234,7 +234,7 @@ router.get('/:workspaceId', async (req, res) => {
     }
 });
 ```
-* **Explanation**: First validates that the calling user belongs to the workspace by looking up the composite PK `workspaceId_userId` in `workspace_members`. If not, we return `403 Forbidden` to prevent random metadata scanning.
+* **Explanation**: First validates that the calling user belongs to the workspace by looking up the composite PK `workspaceId_userId` in `workspace_members`. If not, I return `403 Forbidden` to prevent random metadata scanning.
 
 #### 4.2.4 Update Workspace
 ```javascript
@@ -273,7 +273,7 @@ router.put('/:workspaceId', async (req, res) => {
     }
 });
 ```
-* **Explanation**: Validates that the database record's `ownerId` matches the token's authenticated `userId`. We also use ternary null-checks (`!== undefined`) so callers can selectively update individual fields (e.g. only name or only description) without wiping other fields.
+* **Explanation**: Validates that the database record's `ownerId` matches the token's authenticated `userId`. I also use ternary null-checks (`!== undefined`) so callers can selectively update individual fields (e.g. only name or only description) without wiping other fields.
 
 #### 4.2.5 Delete Workspace
 ```javascript

@@ -1,12 +1,12 @@
 # CodeMesh: Master Architecture & Code Reference Guide
 
-This document is a comprehensive architectural map and code reference guide for the **CodeMesh** project (Phases 1 & 2). It documents every file created, explains how they connect, and detail the technical decisions made.
+This document is a comprehensive architectural map and code reference guide for my **CodeMesh** project (Phases 1 & 2). It documents every file I created, explains how they connect, and details the technical decisions I made.
 
 ---
 
 ## 1. How the Files Connect (Architecture Map)
 
-Here is a visual map showing how the backend files interact to handle an authentication request:
+Here is a visual map showing how my backend files interact to handle an authentication request:
 
 ```mermaid
 flowchart TD
@@ -29,9 +29,9 @@ flowchart TD
 ```
 
 ### The Request Lifecycle Flow:
-1. **Entry Point (`src/index.js`)**: The server initializes, configures global CORS settings and JSON parsing middleware, and listens on port `5000`. It acts as the gatekeeper, forwarding any request starting with `/api/v1/auth` to the auth router.
+1. **Entry Point (`src/index.js`)**: My server initializes, configures global CORS settings and JSON parsing middleware, and listens on port `5000`. It acts as the gatekeeper, forwarding any request starting with `/api/v1/auth` to the auth router.
 2. **Auth Router (`src/routes/auth.js`)**: Maps the sub-paths (`/register`, `/login`, `/me`) to their respective controller functions.
-3. **Shared Database Instance (`src/lib/prisma.js`)**: To perform database operations, the router talks to the shared database file. This file ensures that `dotenv.config()` is executed *first* before any connection is made, loading your credentials from `.env` to connect to PostgreSQL.
+3. **Shared Database Instance (`src/lib/prisma.js`)**: To perform database operations, the router talks to the shared database file. This file ensures that `dotenv.config()` is executed *first* before any connection is made, loading my credentials from `.env` to connect to PostgreSQL.
 4. **Security Utilities (`src/utils/auth.js`)**: When registering or logging in, the router calls this helper to either hash a new password using `bcrypt` or sign a JWT session token to return to the client.
 5. **Session Verification (`src/middleware/auth.js`)**: When the user requests their profile via `/me`, the request must pass through this security guard. The middleware reads the token, decodes the user's ID, and validates it. If valid, it allows the router code to fetch the user profile.
 
@@ -39,7 +39,7 @@ flowchart TD
 
 ## 2. Comprehensive File Breakdown
 
-Here is the complete source code for each file in the workspace, along with detailed explanations.
+Here is the complete source code for each file in my workspace, along with detailed explanations.
 
 ### 2.1 Configuration Files
 
@@ -77,7 +77,7 @@ Here is the complete source code for each file in the workspace, along with deta
   }
 }
 ```
-* **`"type": "module"`**: Directs Node.js to treat our JavaScript files as ES Modules, enabling the `import/export` syntax instead of CommonJS `require()`.
+* **`"type": "module"`**: Directs Node.js to treat my JavaScript files as ES Modules, enabling the `import/export` syntax instead of CommonJS `require()`.
 * **`nodemon`**: A tool that monitors source code changes and automatically restarts the process, removing the need to restart the server manually.
 * **`pg` & `@prisma/adapter-pg`**: The PostgreSQL node driver and its Prisma adapter. Needed because Prisma 7 requires driver adapters to handle database connections.
 
@@ -101,8 +101,8 @@ DATABASE_URL="postgresql://postgres:op%40098@localhost:5432/codemesh?schema=publ
 PORT=5000
 JWT_SECRET="your-long-random-secret-key
 ```
-* **`DATABASE_URL`**: Connects to the PostgreSQL instance running locally. The `@` character in the password `your_password` and it should be URL-encoded so it doesn't break URL path parsing.
-* **`JWT_SECRET`**: A private key used by the cryptographic algorithm to sign and verify our authentication tokens.
+* **`DATABASE_URL`**: Connects to the PostgreSQL instance running locally. The `@` character in my password should be URL-encoded so it doesn't break URL path parsing.
+* **`JWT_SECRET`**: A private key used by the cryptographic algorithm to sign and verify my authentication tokens.
 
 ---
 
@@ -187,8 +187,8 @@ const adapter = new PrismaPg(pool);
 
 export const prisma = new PrismaClient({ adapter });
 ```
-* **Why**: Solves the ES Modules initialization order bug. By calling `dotenv.config()` here before `new pg.Pool(...)` is evaluated, we ensure `process.env.DATABASE_URL` is loaded.
-* **Reuse Connection Pool**: Exporting a single `prisma` instance guarantees the entire server shares one database connection pool, preventing connection leaks.
+* **Why**: Solves the ES Modules initialization order bug. By calling `dotenv.config()` here before `new pg.Pool(...)` is evaluated, I ensure `process.env.DATABASE_URL` is loaded.
+* **Reuse Connection Pool**: Exporting a single `prisma` instance guarantees my entire server shares one database connection pool, preventing connection leaks.
 
 ---
 
@@ -218,7 +218,7 @@ export const generateToken = (userId) => {
     });
 };
 ```
-* **`bcrypt.hash()`**: Salting hashes (10 rounds) ensures that even if two users choose the same password, they will have completely different hashes stored in the database.
+* **`bcrypt.hash()`**: Salting hashes (10 rounds) ensures that even if two users choose the same password, they will have completely different hashes stored in my database.
 * **`jwt.sign()`**: Packages the user ID into a secure token string, which expires in 24 hours.
 
 ---
@@ -350,7 +350,7 @@ router.get('/me', authenticateToken, async (req, res) => {
 
 export default router;
 ```
-* **Security best practice**: On login failure, we send `"Invalid email or password"` instead of distinguishing whether the email was wrong or the password was wrong. This prevents attackers from guessing valid emails registered on our platform.
+* **Security best practice**: On login failure, I send `"Invalid email or password"` instead of distinguishing whether the email was wrong or the password was wrong. This prevents attackers from guessing valid emails registered on my platform.
 * **`select` Object**: Specifically filters out the `passwordHash` field when returning the user profile from `/me`.
 
 ---
@@ -464,7 +464,7 @@ async function runTests() {
 
 runTests();
 ```
-* **Why**: Automates the integration testing process using native Node.js `fetch` without needing external API clients like Postman.
+* **Why**: Automates my integration testing process using native Node.js `fetch` without needing external API clients like Postman.
 
 ---
 
@@ -472,7 +472,7 @@ runTests();
 
 | Problem | Cause | Solution |
 |---|---|---|
-| **`client password must be a string`** | ES Modules hoisting executed the routes (which connected to the database) before `dotenv.config()` could read the environment file. | Created `src/lib/prisma.js` to run `dotenv.config()` first, ensuring database credentials load before initialization. |
-| **Database connection parsing error** | The database password `op@098` contains `@`, which conflicts with the URL syntax (`user:password@host`). | URL-encoded the `@` character as `%40` in `.env`. |
-| **Prisma 7 instantiation error** | Prisma 7 no longer embeds query engines. Calling `new PrismaClient()` without adapters throws an error. | Installed `pg` and `@prisma/adapter-pg` to build a manual connection adapter pool. |
-| **PowerShell `curl` errors** | PowerShell defines `curl` as an alias to `Invoke-WebRequest`, which parses JSON headers differently than standard curl. | Used PowerShell's native **`Invoke-RestMethod`** for direct testing, which handles JSON strings cleanly. |
+| **`client password must be a string`** | ES Modules hoisting executed the routes (which connected to the database) before `dotenv.config()` could read the environment file. | I created `src/lib/prisma.js` to run `dotenv.config()` first, ensuring database credentials load before initialization. |
+| **Database connection parsing error** | The database password `op@098` contains `@`, which conflicts with the URL syntax (`user:password@host`). | I URL-encoded the `@` character as `%40` in `.env`. |
+| **Prisma 7 instantiation error** | Prisma 7 no longer embeds query engines. Calling `new PrismaClient()` without adapters throws an error. | I installed `pg` and `@prisma/adapter-pg` to build a manual connection adapter pool. |
+| **PowerShell `curl` errors** | PowerShell defines `curl` as an alias to `Invoke-WebRequest`, which parses JSON headers differently than standard curl. | I used PowerShell's native **`Invoke-RestMethod`** for direct testing, which handles JSON strings cleanly. |

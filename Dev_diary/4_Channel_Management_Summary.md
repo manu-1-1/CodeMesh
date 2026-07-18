@@ -6,7 +6,7 @@ This document describes the design, database models, API routes, security contro
 
 ## 1. Overview of the Channel System
 
-Channels are sub-sections of a workspace dedicated to communication or review activities. The system guarantees that:
+Channels are sub-sections of a workspace dedicated to communication or review activities. My system guarantees that:
 1. **Lobby Initialization**: Every workspace is created with a default, undeletable `#general` channel.
 2. **Role-Based Security**: Workspace regular members can view and join channels, but only **Owners** and **Admins** can create or delete channels.
 3. **Unique Naming Rules**: Channel names within the same workspace must be unique (checked case-insensitively) to prevent confusing duplicate channels.
@@ -85,7 +85,7 @@ All routes require authentication and are registered under the `/api/v1/channels
 ## 4. Detailed Code Breakdown
 
 ### 4.1 Automatic Default Channel Creation
-In [workspaces.js](file:///d:/Projects/CodeMesh/backend/src/routes/workspaces.js), we updated the creation transaction so that new workspaces are provisioned with a default channel:
+In [workspaces.js](file:///d:/Projects/CodeMesh/backend/src/routes/workspaces.js), I updated the creation transaction so that new workspaces are provisioned with a default channel:
 ```javascript
 const result = await prisma.$transaction(async (tx) => {
     // 1. Create workspace
