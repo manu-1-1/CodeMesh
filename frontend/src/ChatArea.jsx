@@ -60,7 +60,8 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
     // 2. Manage Socket.IO connection
     useEffect(() => {
         const token = localStorage.getItem('token');
-        socketRef.current = io('http://localhost:5000', {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+        socketRef.current = io(backendUrl, {
             auth: { token }
         });
 
