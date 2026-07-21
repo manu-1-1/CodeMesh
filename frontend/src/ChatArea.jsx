@@ -117,7 +117,7 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    const fetchChannels = async () => {
+    async function fetchChannels() {
         try {
             const data = await apiRequest(`/channels?workspaceId=${workspace.id}`);
             setChannels(data);
@@ -129,25 +129,25 @@ export default function ChatArea({ workspace, onBackToWorkspaces, currentUser, o
         } catch (err) {
             setError(err.message);
         }
-    };
+    }
 
-    const fetchMembers = async () => {
+    async function fetchMembers() {
         try {
             const data = await apiRequest(`/workspaces/${workspace.id}/members`);
             setMembers(data);
         } catch (err) {
             setError(err.message);
         }
-    };
+    }
 
-    const fetchMessageHistory = async (channelId) => {
+    async function fetchMessageHistory(channelId) {
         try {
             const data = await apiRequest(`/channels/${channelId}/messages`);
             setMessages(data);
         } catch (err) {
             setError(err.message);
         }
-    };
+    }
 
     const handleSendMessage = (e) => {
         e.preventDefault();
