@@ -64,6 +64,7 @@ async function runTests() {
     }
   } catch (error) {
     console.error("\n❌ Test failed with error:", error.message);
+    process.exit(1);
   }
 }
 

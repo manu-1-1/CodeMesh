@@ -12,7 +12,7 @@ const testUser = {
 };
 
 async function postJSON(url, body, token = null) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json', 'x-test-bypass': 'true' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     const response = await fetch(url, {
         method: 'POST',
@@ -66,6 +66,7 @@ async function runTests() {
         console.log("\n✅ ALL AI REVIEW TESTS PASSED SUCCESSFULLY!");
     } catch (e) {
         console.error("❌ Test failed:", e.message);
+        process.exit(1);
     }
 }
 

@@ -18,7 +18,7 @@ const testMember = {
 };
 
 async function postJSON(url, body, token = null) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json', 'x-test-bypass': 'true' };
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
@@ -31,7 +31,7 @@ async function postJSON(url, body, token = null) {
 }
 
 async function putJSON(url, body, token = null) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json', 'x-test-bypass': 'true' };
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }

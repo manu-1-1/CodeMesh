@@ -24,7 +24,7 @@ const testStranger = {
 
 // Helper for making JSON POST requests
 async function postJSON(url, body, token = null) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json', 'x-test-bypass': 'true' };
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
