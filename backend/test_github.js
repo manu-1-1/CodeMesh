@@ -39,7 +39,7 @@ const testUser = {
 };
 
 async function postJSON(url, body, token = null) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json', 'x-test-bypass': 'true' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     const response = await fetch(url, {
         method: 'POST',
@@ -57,7 +57,7 @@ async function getJSON(url, token = null) {
 }
 
 async function deleteJSON(url, body, token = null) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json', 'x-test-bypass': 'true' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     const response = await fetch(url, {
         method: 'DELETE',
