@@ -66,6 +66,7 @@ async function runTests() {
         console.log("\n✅ ALL AI REVIEW TESTS PASSED SUCCESSFULLY!");
     } catch (e) {
         console.error("❌ Test failed:", e.message);
+        process.exit(1);
     }
 }
 
