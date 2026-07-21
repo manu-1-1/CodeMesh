@@ -125,7 +125,7 @@ async function runTests() {
 
         // 8. Clean up (Cascade check)
         console.log("\n8. Cleaning up workspace...");
-        const delRes = await deleteJSON(`${BASE_WORKSPACE_URL}/${workspaceId}`, token);
+        const delRes = await deleteJSON(`${BASE_WORKSPACE_URL}/${workspaceId}`, {}, token);
         if (delRes.status !== 200) throw new Error("Workspace deletion failed");
         console.log("✅ Cleaned up successfully.");
 
