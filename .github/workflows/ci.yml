@@ -71,6 +71,9 @@ jobs:
       - name: Install Backend Dependencies
         run: npm ci
         
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
       - name: Run Database Migrations
         run: npx prisma migrate deploy
         env:
@@ -78,14 +81,14 @@ jobs:
           
       - name: Start Backend Server
         # The '&' runs it in the background so tests can run in the next step
-        run: npm start &
+        run: npm start > server.log 2>&1 &
         env:
           DATABASE_URL: postgresql://postgres:password@localhost:5432/codemesh?schema=public
           PORT: 5000
           JWT_SECRET: "test_secret_key"
           
       - name: Wait for server to start
-        run: sleep 5
+        run: npx --yes wait-on -t 15000 http://localhost:5000/health || (cat server.log && exit 1)
         
       - name: Run Backend Tests
         run: npm test
