@@ -12,6 +12,7 @@ import reviewRoutes from './routes/reviews.js';
 import userRoutes from './routes/users.js';
 import githubRoutes from './routes/github.js';
 import invitationRoutes from './routes/invitations.js';
+import peerReviewRoutes from './routes/peerReviews.js';
 
 
 
@@ -39,6 +40,8 @@ app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/github', githubRoutes);
 // Invitations routes registration
 app.use('/api/v1/invitations', invitationRoutes);
+// Peer Reviews routes registration
+app.use('/api/v1/peer-reviews', peerReviewRoutes);
 
 
 // Health check endpoint

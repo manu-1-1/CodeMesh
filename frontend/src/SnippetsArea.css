@@ -350,3 +350,193 @@
         transform: rotate(360deg);
     }
 }
+
+
+/* ===== Review Panel Tabs ===== */
+.review-panel-tabs {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+}
+
+.review-tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    transition: var(--transition);
+}
+
+.review-tab-btn:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.review-tab-btn.active {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border-focus);
+    color: var(--accent-blue);
+    border-bottom: 2px solid var(--accent-blue);
+}
+
+/* ===== Peer Review Section ===== */
+.peer-review-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 0;
+}
+
+.peer-request-row {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
+
+.peer-request-select {
+    flex: 1;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-size: 13px;
+    outline: none;
+    padding: 8px 12px;
+    transition: var(--transition);
+    appearance: none;
+}
+
+.peer-request-select:focus {
+    border-color: var(--border-focus);
+}
+
+.peer-request-select option {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+/* ===== Peer Review Card ===== */
+.peer-review-card {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+}
+
+/* ===== Status Badges ===== */
+.status-badge-pending,
+.status-badge-approved,
+.status-badge-changes {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+}
+
+.status-badge-pending {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-badge-approved {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-badge-changes {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ===== Peer Reviewer Info Row ===== */
+.peer-reviewer-info {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.peer-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+/* ===== Peer Comment Box ===== */
+.peer-comment-box {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin-top: 8px;
+    padding: 10px 14px;
+}
+
+/* ===== Peer Review Submission Form ===== */
+.peer-review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.peer-review-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+/* ===== Approve / Changes Buttons ===== */
+.btn-approve,
+.btn-changes {
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: var(--transition);
+}
+
+.btn-approve {
+    background-color: #10b981;
+    color: #fff;
+}
+
+.btn-approve:hover {
+    background-color: #059669;
+}
+
+.btn-changes {
+    background-color: #f59e0b;
+    color: #1a1a2e;
+}
+
+.btn-changes:hover {
+    background-color: #d97706;
+}

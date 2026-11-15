@@ -29,6 +29,7 @@ model User {
   aiApiKey     String?
   aiModel      String?
   aiApiUrl     String?
+  peerReviews  PeerReview[]      @relation("UserPeerReviews")
 
   @@map("users")
 }
@@ -111,6 +112,7 @@ model Snippet {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   reviews     CodeReview[]
+  peerReviews PeerReview[]
   @@map("snippets")
 }
 
@@ -191,5 +193,26 @@ model Invitation {
 
   @@unique([workspaceId, email])
   @@map("invitations")
+}
+
+enum PeerReviewStatus {
+  PENDING
+  APPROVED
+  CHANGES_REQUESTED
+}
+
+model PeerReview {
+  id          String           @id @default(uuid())
+  snippetId   String           @map("snippet_id")
+  reviewerId  String           @map("reviewer_id")
+  status      PeerReviewStatus @default(PENDING)
+  comment     String?
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  snippet     Snippet          @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+  reviewer    User             @relation("UserPeerReviews", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@map("peer_reviews")
 }
 

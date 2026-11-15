@@ -87,6 +87,14 @@ router.get('/:snippetId', async (req, res) => {
                 },
                 reviews: {
                     orderBy: { createdAt: 'desc' }
+                },
+                peerReviews: {
+                    orderBy: { createdAt: 'desc' },
+                    include: {
+                        reviewer: {
+                            select: { id: true, name: true, email: true, avatarUrl: true }
+                        }
+                    }
                 }
             }
         });
